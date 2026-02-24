@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+@theme {
+  --color-titan-orange: #E05C00;
+  --color-titan-orange-light: #FF7A1A;
+  --color-titan-orange-dark: #B34A00;
+  --color-titan-sand: #F5E6C8;
+  --color-titan-sand-light: #FFF5E6;
+  --color-titan-sand-dark: #E0CFA8;
+  --color-titan-blue: #1A2B4A;
+  --color-titan-blue-light: #2A3F6A;
+  --color-titan-blue-dark: #0F1A2E;
+  --color-titan-success: #10B981;
+  --color-titan-warning: #F59E0B;
+  --color-titan-danger: #EF4444;
+
+  --font-family-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-family-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-titan-blue);
+    background-color: var(--color-titan-sand-light);
+    min-height: 100dvh;
+  }
+
+  #root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Utility animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(224, 92, 0, 0.4); }
+  50% { box-shadow: 0 0 20px 4px rgba(224, 92, 0, 0.15); }
+}
+
+@keyframes countdown-tick {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out both;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-countdown-tick {
+    animation: countdown-tick 0.3s ease-in-out;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+  }
+
+  .glass-card-dark {
+    background: rgba(26, 43, 74, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    color: white;
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 8px;
+  }
+
+  .gradient-desert {
+    background: linear-gradient(135deg, #1A2B4A 0%, #2A3F6A 40%, #E05C00 100%);
+  }
+
+  .gradient-sand {
+    background: linear-gradient(180deg, #F5E6C8 0%, #FFF5E6 100%);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    min-height: 44px;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #E05C00, #FF7A1A);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(224, 92, 0, 0.4);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    min-height: 44px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1A2B4A;
+    background: white;
+    border: 2px solid #E0CFA8;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .btn-secondary:hover {
+    border-color: #E05C00;
+    color: #E05C00;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 12px 16px;
+    min-height: 44px;
+    font-size: 16px;
+    color: #1A2B4A;
+    background: white;
+    border: 2px solid #E0CFA8;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .input-field:focus {
+    border-color: #E05C00;
+    box-shadow: 0 0 0 3px rgba(224, 92, 0, 0.1);
+  }
+
+  .input-field::placeholder {
+    color: #9CA3AF;
+  }
+}
