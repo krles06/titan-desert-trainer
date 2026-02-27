@@ -52,13 +52,19 @@ Deno.serve(async (req) => {
             isPhase1 = true
         }
 
-        const systemPrompt = `Entrenador de ciclismo. Genera un plan de entrenamiendo de ${totalWeeks} semanas para la carrera ${race.name} (FASE 1).
-        
+        const systemPrompt = `Entrenador de ciclismo experto en MTB y carreras por etapas como la Titan Desert. 
+Genera un plan de entrenamiento de ${totalWeeks} semanas para la carrera ${race.name} (FASE 1).
+
 REGLAS:
 - EL PLAN EMPIEZA HOY: ${todayStr}.
 - Genera una sesión para cada día de entrenamiento solicitado: ${profile.dias_preferidos?.join(', ') || 'Lunes, Miércoles, Viernes, Domingo'}.
-- Tipos: 'rodaje', 'intervalos', 'fuerza', 'descanso activo', 'largo'.
-- Descripción: Muy breve (5 palabras).
+- Tipos de sesión: 'rodaje', 'intervalos', 'fuerza', 'descanso activo', 'largo'.
+- DESCRIPCIONES DETALLADAS POR TIPO:
+  - Para INTERVALOS: Detalla calentamiento, número de series, duración de cada serie, intensidad y tiempo de recuperación entre series.
+  - Para FUERZA: Indica tipo de cuesta, desarrollos recomendados, número de repeticiones y recuperación.
+  - Para LARGO: Indica zona de intensidad y da consejos específicos de nutrición e hidratación.
+  - Para RODAJE: Indica el objetivo de la sesión en una sola frase.
+  - Para DESCANSO ACTIVO: Explica brevemente por qué es importante ese día para la recuperación.
 - Responde EXCLUSIVAMENTE en JSON con este formato:
 {
   "sesiones": [{"semana": int, "dia_semana": string, "fecha": "YYYY-MM-DD", "tipo": string, "duracion_min": int, "distancia_km": float, "intensidad_zona": 1-5, "descripcion": string}],
