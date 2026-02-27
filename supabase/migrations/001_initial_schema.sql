@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   dias_entreno_semana integer NOT NULL CHECK (dias_entreno_semana BETWEEN 2 AND 6),
   minutos_dia integer NOT NULL CHECK (minutos_dia BETWEEN 30 AND 180),
   participado_antes boolean DEFAULT false,
+  dias_preferidos text[] DEFAULT '{}',
+  carrera_id text DEFAULT 'morocco-2026',
   subscription_status text DEFAULT 'trialing' CHECK (subscription_status IN ('active', 'trialing', 'canceled')),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
@@ -43,6 +45,8 @@ CREATE TABLE IF NOT EXISTS sessions (
   tipo text NOT NULL CHECK (tipo IN ('rodaje', 'intervalos', 'fuerza', 'descanso activo', 'largo')),
   duracion_min integer NOT NULL,
   distancia_km decimal NOT NULL,
+  duracion_real integer,
+  distancia_real decimal,
   intensidad_zona integer NOT NULL CHECK (intensidad_zona BETWEEN 1 AND 5),
   descripcion text NOT NULL,
   completada boolean DEFAULT false,

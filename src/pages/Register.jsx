@@ -42,34 +42,41 @@ export default function Register() {
     }
 
     return (
-        <div className="min-h-screen gradient-desert flex flex-col items-center justify-center px-4 py-8">
-            <div className="w-full max-w-sm">
+        <div className="min-h-screen bg-dunr-black flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-blue/5 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-dunr-orange/5 rounded-full blur-3xl -ml-32 -mb-32" />
+
+            <div className="w-full max-w-sm relative z-10">
                 {/* Logo */}
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-titan-orange/20 backdrop-blur-sm mb-4">
-                        <Mountain size={28} className="text-titan-orange-light" />
+                <div className="text-center mb-8 sm:mb-10">
+                    <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
+                        <Mountain size={28} className="text-dunr-blue" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white">Crear cuenta</h1>
-                    <p className="text-white/60 text-sm mt-1">Comienza tu preparación para la Titan Desert</p>
+                    <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter mb-2">
+                        DUN<span className="text-dunr-orange">R</span>
+                    </h1>
+                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Domina el desierto</p>
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="glass-card p-6 space-y-5 border-white/5">
+                    <h2 className="text-lg font-bold text-white uppercase tracking-tight text-center mb-2">Crear cuenta</h2>
                     {error && (
-                        <div className="bg-titan-danger/10 border border-titan-danger/20 text-titan-danger text-sm rounded-xl px-4 py-3">
+                        <div className="bg-titan-danger/10 border border-titan-danger/20 text-titan-danger text-xs font-bold uppercase tracking-wider rounded-xl px-4 py-3">
                             {error}
                         </div>
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-titan-blue/70 mb-1.5">Email</label>
+                        <label className="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2 ml-1">Email</label>
                         <div className="relative">
-                            <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-titan-blue/30" />
+                            <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="input-field pl-10"
+                                className="input-field !pl-12"
                                 placeholder="tu@email.com"
                                 required
                                 autoComplete="email"
@@ -78,14 +85,14 @@ export default function Register() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-titan-blue/70 mb-1.5">Contraseña</label>
+                        <label className="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2 ml-1">Contraseña</label>
                         <div className="relative">
-                            <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-titan-blue/30" />
+                            <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="input-field pl-10 pr-10"
+                                className="input-field !pl-12 !pr-10"
                                 placeholder="Mínimo 6 caracteres"
                                 required
                                 autoComplete="new-password"
@@ -93,22 +100,22 @@ export default function Register() {
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-titan-blue/30 hover:text-titan-blue/60 min-w-[44px] min-h-[44px] flex items-center justify-center -mr-3"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center -mr-3"
                             >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-titan-blue/70 mb-1.5">Confirmar contraseña</label>
+                        <label className="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2 ml-1">Confirmar contraseña</label>
                         <div className="relative">
-                            <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-titan-blue/30" />
+                            <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="input-field pl-10"
+                                className="input-field !pl-12"
                                 placeholder="Repite la contraseña"
                                 required
                                 autoComplete="new-password"
@@ -116,23 +123,25 @@ export default function Register() {
                         </div>
                     </div>
 
-                    <button type="submit" disabled={loading} className="btn-primary w-full">
+                    <button type="submit" disabled={loading} className="btn-primary w-full !text-xs !font-black !uppercase !tracking-widest !py-4 shadow-xl shadow-dunr-blue/20">
                         {loading ? (
-                            <span className="flex items-center gap-2">
+                            <span className="flex items-center justify-center gap-2">
                                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Creando cuenta...
+                                CREANDO...
                             </span>
                         ) : (
                             'Crear mi cuenta'
                         )}
                     </button>
 
-                    <p className="text-center text-sm text-titan-blue/50 pt-1">
-                        ¿Ya tienes cuenta?{' '}
-                        <Link to="/login" className="text-titan-orange font-semibold hover:underline">
-                            Inicia sesión
-                        </Link>
-                    </p>
+                    <div className="text-center pt-2">
+                        <p className="text-[11px] text-white/30 font-bold uppercase tracking-wider">
+                            ¿Ya tienes cuenta?{' '}
+                            <Link to="/login" className="text-dunr-orange hover:underline">
+                                Inicia sesión
+                            </Link>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>

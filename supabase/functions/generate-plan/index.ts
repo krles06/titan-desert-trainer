@@ -25,148 +25,164 @@ Deno.serve(async (req) => {
             )
         }
 
-        const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-        if (!GEMINI_API_KEY) {
-            throw new Error('GEMINI_API_KEY not configured')
+        const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+        if (!OPENAI_API_KEY) {
+            throw new Error('OPENAI_API_KEY not configured')
         }
+
+        const today = new Date()
+        const todayStr = today.toISOString().split('T')[0]
+
+        // Races definition (must match src/lib/races.js)
+        const RACES = [
+            { id: 'morocco-2026', name: 'Škoda Morocco Titan Desert', date: '2026-04-26' },
+            { id: 'almeria-2026', name: 'Titan Desert Almería', date: '2026-10-01' }
+        ]
+        const race = RACES.find(r => r.id === profile.carrera_id) || RACES[0]
+        const raceDate = new Date(race.date)
 
         // Calculate weeks until race
-        const today = new Date()
-        const raceDate = new Date('2026-04-26T00:00:00+01:00')
-        const weeksUntilRace = Math.ceil((raceDate.getTime() - today.getTime()) / (7 * 24 * 60 * 60 * 1000))
-        const startDate = today.toISOString().split('T')[0]
+        const diffTime = raceDate.getTime() - today.getTime()
+        let totalWeeks = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)), 1)
+        let isPhase1 = false
 
-        let readjustmentContext = ''
-        if (reason === 'hard') {
-            readjustmentContext = '\\nATENCIÓN: El ciclista ha indicado que el plan anterior era DEMASIADO EXIGENTE. Reduce ligeramente el volumen (tiempo/distancia) o la intensidad (zonas) respecto a lo que le tocaría por su nivel, asegurando que pueda asimilar el entrenamiento sin sobreentrenarse.'
-        } else if (reason === 'easy') {
-            readjustmentContext = '\\nATENCIÓN: El ciclista ha indicado que el plan anterior era DEMASIADO FÁCIL. Aumenta ligeramente la exigencia (más tiempo en zonas altas o sesiones más largas) para asegurar una progresión adecuada hacia la carrera, sin exceder su disponibilidad de días.'
+        // CAP: If more than 16 weeks, generate only phase 1 (12 weeks) to avoid WORKER_LIMIT
+        if (totalWeeks > 16) {
+            totalWeeks = 12
+            isPhase1 = true
         }
 
-        // Build the prompt
-        const prompt = `Eres un entrenador de ciclismo experto. Genera un plan JSON MUY BREVE Y OPTIMIZADO para un ciclista que se prepara para la Titan Desert.
-Debido a límites de tokens, NO generes todas las semanas posibles. Genera SOLO 4 semanas representativas (semana 1: Inicio, semana 4: Base, semana 8: Volumen, semana 12: Pico/Tapering).
-
-Usuario: ${profile.nombre}, ${profile.edad} años, ${profile.peso}kg, ${profile.altura}cm. Nivel: ${profile.nivel_experiencia}. FC Reposo: ${profile.fc_reposo}.
-Velocidad media: ${profile.velocidad_media}km/h. Distancia máx: ${profile.distancia_maxima}km. Titan Desert previa: ${profile.participado_antes ? 'Sí' : 'No'}.
-Disponibilidad: ${profile.dias_entreno_semana} días/semana, ${profile.minutos_dia} min/día.
-
-DEVUELVE SOLO UN OBJETO JSON EXACTAMENTE ASÍ:
+        const systemPrompt = `Entrenador de ciclismo. Genera un plan de entrenamiendo de ${totalWeeks} semanas para la carrera ${race.name} (FASE 1).
+        
+REGLAS:
+- EL PLAN EMPIEZA HOY: ${todayStr}.
+- Genera una sesión para cada día de entrenamiento solicitado: ${profile.dias_preferidos?.join(', ') || 'Lunes, Miércoles, Viernes, Domingo'}.
+- Tipos: 'rodaje', 'intervalos', 'fuerza', 'descanso activo', 'largo'.
+- Descripción: Muy breve (5 palabras).
+- Responde EXCLUSIVAMENTE en JSON con este formato:
 {
-  "sesiones": [
-    {
-      "semana": 1,
-      "dia_semana": "Lunes",
-      "tipo": "rodaje", // "rodaje"|"intervalos"|"fuerza"|"descanso activo"|"largo"
-      "duracion_min": 60,
-      "distancia_km": 25.5,
-      "intensidad_zona": 2, // 1-5
-      "descripcion": "Breve descripción."
-    }
-  ]
-}
+  "sesiones": [{"semana": int, "dia_semana": string, "fecha": "YYYY-MM-DD", "tipo": string, "duracion_min": int, "distancia_km": float, "intensidad_zona": 1-5, "descripcion": string}],
+  "advertencias": [{"semana": int, "tipo": "alerta_media", "mensaje": string}]
+}`;
 
-Genera exactamente ${profile.dias_entreno_semana} sesiones por cada una de las 4 semanas. Total: ${profile.dias_entreno_semana * 4} sesiones. No más.`
+        const userPrompt = `Usuario: ${profile.nombre}, Nivel: ${profile.nivel_experiencia}. INICIO: ${todayStr}. ${isPhase1 ? 'GENERAR SOLO PRIMERAS 12 SEMANAS.' : ''}`;
 
-        console.log("Calling Gemini API...")
-        // Call Gemini API
-        const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 65536,
-                        responseMimeType: 'application/json',
-                    },
-                }),
+        const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
+                response_format: { type: "json_object" },
+                temperature: 0.1,
+            }),
+        });
+
+        if (!gptResponse.ok) throw new Error(`OpenAI error: ${gptResponse.status}`);
+        const gptData = await gptResponse.json();
+        let responseText: string | null = gptData.choices[0].message.content;
+        const planData = JSON.parse(responseText!);
+
+        // Memory Cleanup: Nullify large strings as soon as possible
+        responseText = null;
+
+        // --- Robust Session Extraction ---
+        const sessionsRaw = planData.sesiones || planData.sessions ||
+            planData.plan?.sesiones || planData.plan?.sessions || [];
+
+        if (!Array.isArray(sessionsRaw) || sessionsRaw.length === 0) {
+            throw new Error('No se detectaron sesiones en la respuesta de la IA.');
+        }
+
+        const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+        const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+        const token = authHeader?.replace('Bearer ', '') ?? '';
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+        if (authError || !user) {
+            throw new Error('Sesión no autorizada');
+        }
+
+        console.log(`Generating plan for user: ${user.id} (${totalWeeks} weeks) ${isPhase1 ? '(Phase 1)' : ''}`);
+
+        // Borrar planes y sesiones antiguos
+        const { error: deleteError } = await supabase.from('training_plans').delete().eq('user_id', user.id);
+        if (deleteError) console.warn('Warning deleting old plans:', deleteError);
+
+        // Insertar nuevo plan
+        const { data: plan, error: planError } = await supabase.from('training_plans').insert({
+            user_id: user.id,
+            plan_json: planData,
+            activo: true
+        }).select().single();
+
+        if (planError || !plan) throw new Error(`Error al crear plan: ${planError?.message}`);
+
+        // --- Session Type Mapping ---
+        const mapType = (type: string) => {
+            const t = type?.toLowerCase() || 'rodaje';
+            if (t.includes('interv') || t.includes('seri')) return 'intervalos';
+            if (t.includes('fuerz') || t.includes('cuest')) return 'fuerza';
+            if (t.includes('descans') || t.includes('activ') || t.includes('recup')) return 'descanso activo';
+            if (t.includes('larg') || t.includes('fond')) return 'largo';
+            return 'rodaje';
+        };
+
+        // --- Date Normalization Helper ---
+        const normalizeDate = (dateStr: string) => {
+            if (!dateStr) return todayStr;
+            if (dateStr.endsWith('-02-29')) {
+                const year = parseInt(dateStr.split('-')[0]);
+                const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+                if (!isLeap) return `${year}-03-01`;
             }
-        )
+            return dateStr;
+        };
 
-        if (!geminiResponse.ok) {
-            const errorText = await geminiResponse.text()
-            throw new Error(`Gemini API error: ${geminiResponse.status} - ${errorText}`)
-        }
-
-        const geminiData = await geminiResponse.json()
-        const responseText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text
-
-        if (!responseText) {
-            throw new Error('Empty response from Gemini')
-        }
-
-        // Parse the JSON response
-        const planData = JSON.parse(responseText)
-
-        if (!planData.sesiones || !Array.isArray(planData.sesiones)) {
-            throw new Error('Invalid plan structure from Gemini')
-        }
-
-        // Save to Supabase
-        const supabaseUrl = Deno.env.get('SUPABASE_URL')
-        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-        // Get user from auth header
-        const authHeader = req.headers.get('Authorization')
-        const token = authHeader?.replace('Bearer ', '')
-        const { data: { user }, error: userError } = await supabase.auth.getUser(token)
-
-        if (userError || !user) {
-            throw new Error('Unauthorized')
-        }
-
-        // Deactivate existing plans
-        await supabase
-            .from('training_plans')
-            .update({ activo: false })
-            .eq('user_id', user.id)
-
-        // Insert new plan
-        const { data: plan, error: planError } = await supabase
-            .from('training_plans')
-            .insert({
-                user_id: user.id,
-                plan_json: planData,
-                activo: true,
-            })
-            .select()
-            .single()
-
-        if (planError) throw planError
-
-        // Insert sessions
-        const sessionsToInsert = planData.sesiones.map((s) => ({
+        const sessionsToInsert = sessionsRaw.map((s: any) => ({
             plan_id: plan.id,
-            semana: s.semana,
-            dia_semana: s.dia_semana,
-            fecha: s.fecha,
-            tipo: s.tipo,
-            duracion_min: s.duracion_min,
-            distancia_km: s.distancia_km,
-            intensidad_zona: s.zona_intensidad,
-            descripcion: s.descripcion,
-            completada: false,
-        }))
+            semana: s.semana || 1,
+            dia_semana: s.dia_semana || 'Lunes',
+            fecha: normalizeDate(s.fecha),
+            tipo: mapType(s.tipo),
+            duracion_min: s.duracion_min || 60,
+            distancia_km: s.distancia_km || 20,
+            intensidad_zona: Math.max(1, Math.min(5, parseInt(s.intensidad_zona) || 2)),
+            descripcion: s.descripcion || 'Entrenamiento del día',
+            completada: false
+        }));
 
-        const { error: sessionsError } = await supabase
+        console.log(`Inserting ${sessionsToInsert.length} sessions in chunks...`);
+
+        const CHUNK_SIZE = 40; // Slightly smaller chunks to be extra safe
+        for (let i = 0; i < sessionsToInsert.length; i += CHUNK_SIZE) {
+            const chunk = sessionsToInsert.slice(i, i + CHUNK_SIZE);
+            const { error: sessionsError } = await supabase.from('sessions').insert(chunk);
+            if (sessionsError) {
+                console.error(`Error in chunk ${i}:`, sessionsError);
+                throw new Error(`Error DB Sesiones: ${sessionsError.message}`);
+            }
+        }
+
+        // Final Verify
+        const { count } = await supabase
             .from('sessions')
-            .insert(sessionsToInsert)
+            .select('*', { count: 'exact', head: true })
+            .eq('plan_id', plan.id);
 
-        if (sessionsError) throw sessionsError
+        console.log(`Verified insertion: ${count} sessions in DB.`);
 
-        return new Response(
-            JSON.stringify({ success: true, plan_id: plan.id, sessions_count: sessionsToInsert.length }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+        return new Response(JSON.stringify({
+            success: true,
+            is_phase_1: isPhase1,
+            count: count,
+            plan_id: plan.id
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     } catch (error) {
-        console.error('Error:', error)
-        return new Response(
-            JSON.stringify({ error: error.message }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+        console.error('Final error:', error);
+        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-})
+});

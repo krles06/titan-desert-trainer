@@ -41,44 +41,48 @@ export default function Profile() {
     }
 
     return (
-        <div className="min-h-screen bg-titan-sand-light pb-24">
+        <div className="min-h-screen bg-dunr-black pb-32 relative overflow-hidden">
+            {/* Background elements */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-dunr-blue/5 rounded-full blur-3xl -mr-40 -mt-40" />
+            <div className="absolute top-1/2 left-0 w-64 h-64 bg-dunr-orange/5 rounded-full blur-3xl -ml-32" />
+
             {/* Header */}
-            <div className="gradient-desert px-4 pt-6 pb-10">
+            <div className="gradient-dark px-4 pt-10 pb-16 border-b border-white/5">
                 <div className="max-w-lg mx-auto">
-                    <h1 className="text-2xl font-bold text-white mb-2">Mi perfil</h1>
-                    <div className="flex items-center gap-2 text-white/50">
+                    <h1 className="text-3xl font-black text-white mb-2 tracking-tighter">MI PERFIL</h1>
+                    <div className="flex items-center gap-2 text-white/40">
                         <Mail size={14} />
-                        <span className="text-sm">{user?.email || 'demo@titandesert.com'}</span>
+                        <span className="text-xs font-bold uppercase tracking-widest">{user?.email || 'demo@titandesert.com'}</span>
                     </div>
                 </div>
             </div>
 
             <div className="px-4 -mt-4 max-w-lg mx-auto space-y-4">
                 {/* Profile card */}
-                <div className="glass-card p-5 animate-fade-in">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full bg-titan-orange/10 flex items-center justify-center">
-                                <User size={24} className="text-titan-orange" />
+                <div className="glass-card p-6 animate-fade-in border-white/10 relative z-10">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
+                                <User size={32} className="text-dunr-blue" />
                             </div>
                             <div>
-                                <h2 className="font-bold text-titan-blue">{profile?.nombre || 'Ciclista'}</h2>
-                                <p className="text-xs text-titan-blue/40">{LEVELS[profile?.nivel_experiencia] || 'Intermedio'}</p>
+                                <h2 className="text-xl font-black text-white uppercase tracking-tight">{profile?.nombre || 'Ciclista'}</h2>
+                                <p className="text-[10px] font-black text-dunr-orange uppercase tracking-widest mt-0.5">{LEVELS[profile?.nivel_experiencia] || 'Intermedio'}</p>
                             </div>
                         </div>
                         <button
                             onClick={() => setEditing(!editing)}
-                            className="text-sm text-titan-orange font-medium hover:underline min-h-[44px] flex items-center"
+                            className="bg-white/10 px-4 py-2 rounded-xl text-[10px] text-white font-black uppercase tracking-widest hover:bg-white/20 transition-colors"
                         >
                             {editing ? 'Cancelar' : 'Editar'}
                         </button>
                     </div>
 
                     {editing ? (
-                        <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs text-titan-blue/50 mb-1 block">Nombre</label>
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block ml-1">Nombre</label>
                                     <input
                                         type="text"
                                         value={form.nombre || ''}
@@ -87,7 +91,7 @@ export default function Profile() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-titan-blue/50 mb-1 block">Edad</label>
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block ml-1">Edad</label>
                                     <input
                                         type="number"
                                         value={form.edad || ''}
@@ -96,7 +100,7 @@ export default function Profile() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-titan-blue/50 mb-1 block">Peso (kg)</label>
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block ml-1">Peso (kg)</label>
                                     <input
                                         type="number"
                                         value={form.peso || ''}
@@ -105,7 +109,7 @@ export default function Profile() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-titan-blue/50 mb-1 block">Altura (cm)</label>
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block ml-1">Altura (cm)</label>
                                     <input
                                         type="number"
                                         value={form.altura || ''}
@@ -114,9 +118,9 @@ export default function Profile() {
                                     />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs text-titan-blue/50 mb-1 block">Vel. media (km/h)</label>
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block ml-1">Vel. media</label>
                                     <input
                                         type="number"
                                         value={form.velocidad_media || ''}
@@ -125,7 +129,7 @@ export default function Profile() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-titan-blue/50 mb-1 block">Dist. máxima (km)</label>
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block ml-1">Dist. máxima</label>
                                     <input
                                         type="number"
                                         value={form.distancia_maxima || ''}
@@ -134,9 +138,9 @@ export default function Profile() {
                                     />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs text-titan-blue/50 mb-1 block">Días/semana</label>
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block ml-1">Días/semana</label>
                                     <input
                                         type="number"
                                         min="2"
@@ -147,7 +151,7 @@ export default function Profile() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-titan-blue/50 mb-1 block">Min/día</label>
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block ml-1">Min/día</label>
                                     <input
                                         type="number"
                                         value={form.minutos_dia || 60}
@@ -156,12 +160,12 @@ export default function Profile() {
                                     />
                                 </div>
                             </div>
-                            <button onClick={handleSave} disabled={saving} className="btn-primary w-full">
+                            <button onClick={handleSave} disabled={saving} className="btn-primary w-full !py-4 !text-xs !font-black !uppercase !tracking-widest shadow-xl shadow-dunr-blue/20">
                                 {saving ? 'Guardando...' : <><Save size={16} /> Guardar cambios</>}
                             </button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                        <div className="grid grid-cols-2 gap-y-6 gap-x-4">
                             <ProfileStat label="Edad" value={`${profile?.edad || '-'} años`} />
                             <ProfileStat label="Peso" value={`${profile?.peso || '-'} kg`} />
                             <ProfileStat label="Altura" value={`${profile?.altura || '-'} cm`} />
@@ -175,41 +179,67 @@ export default function Profile() {
                 </div>
 
                 {/* Actions */}
-                <div className="glass-card overflow-hidden animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                <div className="glass-card overflow-hidden animate-fade-in border-white/5" style={{ animationDelay: '0.1s' }}>
                     <button
                         onClick={() => navigate('/subscription')}
-                        className="w-full flex items-center gap-3 px-5 py-4 hover:bg-titan-sand/50 transition-colors min-h-[44px]"
+                        className="w-full flex items-center gap-4 px-6 py-5 hover:bg-white/5 transition-colors group"
                     >
-                        <Shield size={18} className="text-titan-blue/60" />
-                        <span className="text-sm font-medium text-titan-blue flex-1 text-left">Mi Suscripción</span>
-                        <ChevronRight size={16} className="text-titan-blue/30" />
+                        <div className="w-10 h-10 rounded-xl bg-dunr-blue/10 flex items-center justify-center text-dunr-blue transition-colors group-hover:bg-dunr-blue group-hover:text-white">
+                            <Shield size={20} />
+                        </div>
+                        <span className="text-xs font-black uppercase tracking-widest text-white flex-1 text-left">Mi Suscripción</span>
+                        <ChevronRight size={16} className="text-white/20" />
                     </button>
-                    <div className="border-t border-titan-sand-dark/20" />
-                    <button
-                        onClick={() => navigate('/generate-plan')}
-                        className="w-full flex items-center gap-3 px-5 py-4 hover:bg-titan-sand/50 transition-colors min-h-[44px]"
-                    >
-                        <RefreshCw size={18} className="text-titan-orange" />
-                        <span className="text-sm font-medium text-titan-blue flex-1 text-left">Regenerar plan de entrenamiento</span>
-                        <ChevronRight size={16} className="text-titan-blue/30" />
-                    </button>
-                    <div className="border-t border-titan-sand-dark/20" />
+                    <div className="h-px bg-white/5" />
+                    <div className="px-6 py-6">
+                        <div className="flex items-center gap-4 mb-5">
+                            <div className="w-10 h-10 rounded-xl bg-dunr-orange/10 flex items-center justify-center text-dunr-orange">
+                                <RefreshCw size={20} />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Gestión del Plan</span>
+                        </div>
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => navigate('/generate-plan?reason=manual_refresh')}
+                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-dunr-blue/5 border border-dunr-blue/10 hover:bg-dunr-blue/10 transition-all group"
+                            >
+                                <div className="text-left">
+                                    <p className="text-xs font-black text-white uppercase tracking-wider mb-1">Mantener mis datos</p>
+                                    <p className="text-[10px] text-white/40 font-medium">Regenera sesiones con tu perfil actual</p>
+                                </div>
+                                <RefreshCw size={16} className="text-dunr-blue group-hover:rotate-180 transition-transform duration-500" />
+                            </button>
+                            <button
+                                onClick={() => navigate('/onboarding')}
+                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group"
+                            >
+                                <div className="text-left">
+                                    <p className="text-xs font-black text-white/60 uppercase tracking-wider mb-1 group-hover:text-white transition-colors">Cambiar mi perfil</p>
+                                    <p className="text-[10px] text-white/30 font-medium">Modifica tus datos y crea un plan nuevo</p>
+                                </div>
+                                <ChevronRight size={16} className="text-white/20 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="h-px bg-white/5" />
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-5 py-4 hover:bg-titan-sand/50 transition-colors min-h-[44px]"
+                        className="w-full flex items-center gap-4 px-6 py-5 hover:bg-white/5 transition-colors group"
                     >
-                        <LogOut size={18} className="text-titan-danger" />
-                        <span className="text-sm font-medium text-titan-danger flex-1 text-left">Cerrar sesión</span>
+                        <div className="w-10 h-10 rounded-xl bg-titan-danger/10 flex items-center justify-center text-titan-danger transition-colors group-hover:bg-titan-danger group-hover:text-white">
+                            <LogOut size={20} />
+                        </div>
+                        <span className="text-xs font-black uppercase tracking-widest text-titan-danger flex-1 text-left">Cerrar sesión</span>
                     </button>
                 </div>
 
                 {/* App info */}
-                <div className="text-center py-4">
-                    <div className="flex items-center justify-center gap-1.5 text-titan-blue/30 mb-1">
+                <div className="text-center py-8">
+                    <div className="flex items-center justify-center gap-1.5 text-white/20 mb-2">
                         <Mountain size={14} />
-                        <span className="text-xs font-medium">Titan Desert Trainer</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">DUNR</span>
                     </div>
-                    <p className="text-[10px] text-titan-blue/20">v1.0 · Hecho con ❤️ para ciclistas</p>
+                    <p className="text-[8px] font-black uppercase tracking-widest text-white/10">v1.2 · Preparación extrema</p>
                 </div>
             </div>
         </div>
@@ -218,9 +248,9 @@ export default function Profile() {
 
 function ProfileStat({ label, value }) {
     return (
-        <div>
-            <p className="text-xs text-titan-blue/40">{label}</p>
-            <p className="font-semibold text-titan-blue">{value}</p>
+        <div className="space-y-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-white/30">{label}</p>
+            <p className="text-sm font-bold text-white">{value}</p>
         </div>
     )
 }

@@ -4,7 +4,7 @@ export const DEMO_MODE = import.meta.env.VITE_SUPABASE_URL === 'https://placehol
 
 export const DEMO_USER = {
     id: 'demo-user-001',
-    email: 'demo@titandesert.com',
+    email: 'demo@dunr.com',
 }
 
 export const DEMO_PROFILE = {
@@ -26,29 +26,29 @@ export const DEMO_PROFILE = {
 const SESSION_TYPES = ['rodaje', 'intervalos', 'fuerza', 'descanso activo', 'largo']
 const DESCRIPTIONS = {
     rodaje: [
-        'Rodaje suave en zona 2 para trabajar la base aeróbica.',
-        'Pedaleo continuo a ritmo cómodo. Mantén cadencia alta (85-95 rpm).',
-        'Rodaje de recuperación activa. No superar zona 2 en ningún momento.',
+        'Rodaje suave en Z2 para base aeróbica. Tip: No te cebes con el ritmo.',
+        'Pedaleo continuo a ritmo cómodo. Tip: Mantén cadencia alta.',
+        'Recuperación activa en Z1-Z2. Tip: Revisa la presión de tus neumáticos.',
     ],
     intervalos: [
-        'Calentamiento 15 min + 6x3 min en zona 4 con 3 min recuperación + 10 min vuelta a la calma.',
-        'Calentamiento 20 min + 4x5 min en zona 3-4 con 4 min recuperación.',
-        'Series cortas: 10x1 min en zona 5 con 2 min recuperación entre series.',
+        'Series de 6x3 min en Z4 con 3 min recuper. Tip: Aprende a sufrir un poco.',
+        '4 bloques de 5 min en Z3-Z4 con 4 min de recuperación activa.',
+        'Intervalos cortos: 10x1 min en Z5 con 2 min de descanso total.',
     ],
     fuerza: [
-        'Rodaje con tramos de fuerza: 5x5 min en desarrollo largo a cadencia baja (50-60 rpm) en zona 3.',
-        'Subidas sentado a cadencia baja. Busca pendientes del 5-8%. 4 repeticiones de 8 min.',
-        'Trabajo de torque en llano: tramos de 10 min a cadencia 55-65 rpm en zona 3.',
+        '5 series de 6 min a baja cadencia (60 rpm) en subida. Fuerza pura.',
+        'Rodaje con tramos de 10 min en desarrollo largo en llano. Zona 3.',
+        '4 subidas de 8 min alternando sentado y de pie. Mejora tu torque.',
     ],
     'descanso activo': [
-        'Paseo suave en bici o caminata de 30-40 min. Mantén pulsaciones bajas.',
-        'Rodaje muy suave en zona 1. Pedaleo recreativo sin esfuerzo.',
-        'Estiramientos + rodillo suave 20 min. Día de recuperación activa.',
+        '30-40 min de pedaleo suave. Tip: Limpia hoy tu transmisión.',
+        'Rodaje regenerativo de 45 min en Z1. La mente también descansa.',
+        '30 min de rodillo suave. Tip: Repasa tu kit de herramientas.',
     ],
     largo: [
-        'Salida larga simulando condiciones de carrera. Lleva hidratación y nutrición.',
-        'Ruta larga a ritmo constante en zona 2-3. Practica tu estrategia de alimentación.',
-        'Salida de fondo con tramos variados. Incluye algo de desnivel si es posible.',
+        'Entrenamiento de fondo (+2h). Practica tu hidratación y nutrición.',
+        'Rodaje largo en Z2 con navegación. Tip: No te desvíes del track.',
+        'Salida de fondo con desnivel variado. Acostumbra el cuerpo al sillín.',
     ],
 }
 

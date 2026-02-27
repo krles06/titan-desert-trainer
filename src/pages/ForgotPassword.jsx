@@ -30,45 +30,53 @@ export default function ForgotPassword() {
     }
 
     return (
-        <div className="min-h-screen gradient-desert flex flex-col items-center justify-center px-4 py-8">
-            <div className="w-full max-w-sm">
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-titan-orange/20 backdrop-blur-sm mb-4">
-                        <Mountain size={28} className="text-titan-orange-light" />
+        <div className="min-h-screen bg-dunr-black flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-blue/5 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-dunr-orange/5 rounded-full blur-3xl -ml-32 -mb-32" />
+
+            <div className="w-full max-w-sm relative z-10">
+                <div className="text-center mb-8 sm:mb-10">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
+                        <Mountain size={28} className="text-dunr-orange" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white">Recuperar contraseña</h1>
-                    <p className="text-white/60 text-sm mt-1">Te enviaremos un enlace de recuperación</p>
+                    <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter mb-2">
+                        DUN<span className="text-dunr-orange">R</span>
+                    </h1>
+                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Recuperar acceso</p>
                 </div>
 
-                <div className="glass-card p-6">
+                <div className="glass-card p-6 border-white/5">
                     {sent ? (
                         <div className="text-center py-4">
-                            <CheckCircle size={48} className="text-titan-success mx-auto mb-4" />
-                            <h2 className="text-lg font-semibold text-titan-blue mb-2">¡Email enviado!</h2>
-                            <p className="text-sm text-titan-blue/60 mb-6">
-                                Revisa tu bandeja de entrada en <strong>{email}</strong> y sigue las instrucciones.
+                            <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <CheckCircle size={32} className="text-emerald-500" />
+                            </div>
+                            <h2 className="text-xl font-black text-white uppercase tracking-tight mb-2">¡EMAIL ENVIADO!</h2>
+                            <p className="text-sm text-white/40 mb-8 leading-relaxed font-medium">
+                                Revisa tu bandeja de entrada en <span className="text-white">{email}</span> y sigue las instrucciones.
                             </p>
-                            <Link to="/login" className="btn-primary w-full text-center">
+                            <Link to="/login" className="btn-primary w-full text-center !py-4 !text-xs !font-black !uppercase !tracking-widest">
                                 Volver al login
                             </Link>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-5">
                             {error && (
-                                <div className="bg-titan-danger/10 border border-titan-danger/20 text-titan-danger text-sm rounded-xl px-4 py-3">
+                                <div className="bg-titan-danger/10 border border-titan-danger/20 text-titan-danger text-xs font-bold uppercase tracking-wider rounded-xl px-4 py-3">
                                     {error}
                                 </div>
                             )}
 
                             <div>
-                                <label className="block text-sm font-medium text-titan-blue/70 mb-1.5">Email</label>
+                                <label className="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2 ml-1">Email</label>
                                 <div className="relative">
-                                    <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-titan-blue/30" />
+                                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="input-field pl-10"
+                                        className="input-field !pl-12"
                                         placeholder="tu@email.com"
                                         required
                                         autoComplete="email"
@@ -76,12 +84,12 @@ export default function ForgotPassword() {
                                 </div>
                             </div>
 
-                            <button type="submit" disabled={loading} className="btn-primary w-full">
-                                {loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
+                            <button type="submit" disabled={loading} className="btn-primary w-full !py-4 !text-xs !font-black !uppercase !tracking-widest shadow-xl shadow-dunr-blue/20">
+                                {loading ? 'Enviando...' : 'Enviar enlace'}
                             </button>
 
-                            <Link to="/login" className="flex items-center justify-center gap-2 text-sm text-titan-blue/50 hover:text-titan-orange pt-1">
-                                <ArrowLeft size={16} /> Volver al login
+                            <Link to="/login" className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-wider text-white/30 hover:text-dunr-orange pt-2 transition-colors">
+                                <ArrowLeft size={14} /> Volver al login
                             </Link>
                         </form>
                     )}

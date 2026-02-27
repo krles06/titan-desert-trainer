@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 
-const RACE_DATE = new Date('2026-04-26T00:00:00+01:00').getTime()
+const DEFAULT_DATE = '2026-04-26T00:00:00+01:00'
 
-function getTimeRemaining() {
+function getTimeRemaining(targetDate) {
+    const raceDate = new Date(targetDate || DEFAULT_DATE).getTime()
     const now = Date.now()
-    const diff = RACE_DATE - now
+    const diff = raceDate - now
 
     if (diff <= 0) {
         return { days: 0, hours: 0, minutes: 0, seconds: 0, finished: true }
@@ -34,45 +35,46 @@ function CountdownUnit({ value, label, mini }) {
 
     if (mini) {
         return (
-            <div className="flex items-baseline gap-1">
-                <span className={`text-xl font-bold tabular-nums ${animate ? 'animate-countdown-tick' : ''}`}>
+            <div className="flex flex-col items-center">
+                <span className={`text-base font-black tabular-nums tracking-tighter text-white ${animate ? 'animate-countdown-tick' : ''}`}>
                     {String(value).padStart(2, '0')}
                 </span>
-                <span className="text-xs text-white/60 font-medium">{label}</span>
+                <span className="text-[8px] font-black text-white/20 uppercase tracking-widest -mt-1">{label}</span>
             </div>
         )
     }
 
     return (
         <div className="flex flex-col items-center">
-            <div className={`glass-card-dark px-4 py-3 min-w-[70px] text-center ${animate ? 'animate-countdown-tick' : ''}`}>
-                <span className="text-3xl sm:text-4xl font-bold tabular-nums text-white">
+            <div className={`glass-card-dark px-2 sm:px-4 py-3 min-w-[60px] sm:min-w-[80px] text-center border-white/5 relative overflow-hidden ${animate ? 'animate-countdown-tick' : ''}`}>
+                <span className="text-3xl sm:text-5xl font-black tabular-nums text-white tracking-tighter">
                     {String(value).padStart(2, '0')}
                 </span>
+                <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
             </div>
-            <span className="text-xs mt-1.5 font-medium text-titan-blue/60 uppercase tracking-wider">{label}</span>
+            <span className="text-[10px] sm:text-xs mt-3 font-black text-white/30 uppercase tracking-[0.2em] ml-1">{label}</span>
         </div>
     )
 }
 
-export default function CountdownTimer({ mini = false }) {
-    const [time, setTime] = useState(getTimeRemaining)
+export default function CountdownTimer({ mini = false, targetDate, raceName }) {
+    const [time, setTime] = useState(() => getTimeRemaining(targetDate))
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setTime(getTimeRemaining())
+            setTime(getTimeRemaining(targetDate))
         }, 1000)
         return () => clearInterval(interval)
-    }, [])
+    }, [targetDate])
 
     if (time.finished) {
         return (
-            <div className={`text-center ${mini ? 'py-2' : 'py-6'}`}>
-                <div className={`font-bold ${mini ? 'text-lg' : 'text-2xl'} text-titan-orange`}>
-                    🎉 ¡La carrera ha comenzado!
+            <div className={`text-center ${mini ? 'py-1' : 'py-8'}`}>
+                <div className={`font-black uppercase tracking-tighter ${mini ? 'text-sm' : 'text-3xl'} text-dunr-orange`}>
+                    🎉 ¡MISIÓN INICIADA!
                 </div>
                 {!mini && (
-                    <p className="text-titan-blue/60 mt-2">La Škoda Morocco Titan Desert está en marcha.</p>
+                    <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.3em] mt-4">La {raceName || 'Titan Desert'} está en curso.</p>
                 )}
             </div>
         )
@@ -80,16 +82,16 @@ export default function CountdownTimer({ mini = false }) {
 
     if (mini) {
         return (
-            <div className="glass-card-dark px-4 py-3 flex items-center gap-3">
-                <span className="text-xs text-white/60 font-medium">🏁 Faltan</span>
-                <div className="flex items-center gap-2 text-white">
-                    <CountdownUnit value={time.days} label="d" mini />
-                    <span className="text-white/30">:</span>
-                    <CountdownUnit value={time.hours} label="h" mini />
-                    <span className="text-white/30">:</span>
-                    <CountdownUnit value={time.minutes} label="m" mini />
-                    <span className="text-white/30">:</span>
-                    <CountdownUnit value={time.seconds} label="s" mini />
+            <div className="glass-card !bg-white/5 px-4 py-3 flex items-center justify-between border-white/5 backdrop-blur-md">
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest">T-MINUS</span>
+                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">TITAN DESERT</span>
+                </div>
+                <div className="flex items-center gap-4">
+                    <CountdownUnit value={time.days} label="days" mini />
+                    <CountdownUnit value={time.hours} label="hours" mini />
+                    <CountdownUnit value={time.minutes} label="min" mini />
+                    <CountdownUnit value={time.seconds} label="sec" mini />
                 </div>
             </div>
         )
@@ -97,17 +99,17 @@ export default function CountdownTimer({ mini = false }) {
 
     return (
         <div className="text-center">
-            <p className="text-sm font-medium text-titan-blue/60 mb-3 uppercase tracking-wider">
-                Cuenta atrás para la carrera
+            <p className="text-[10px] sm:text-xs font-black text-white/30 mb-8 uppercase tracking-[0.4em] ml-1">
+                STATUS: DESIERTO APROXIMÁNDOSE
             </p>
-            <div className="flex items-center justify-center gap-2 sm:gap-3">
-                <CountdownUnit value={time.days} label="días" />
-                <span className="text-2xl font-bold text-titan-blue/20 pt-[-10px]">:</span>
-                <CountdownUnit value={time.hours} label="horas" />
-                <span className="text-2xl font-bold text-titan-blue/20">:</span>
-                <CountdownUnit value={time.minutes} label="minutos" />
-                <span className="text-2xl font-bold text-titan-blue/20">:</span>
-                <CountdownUnit value={time.seconds} label="segundos" />
+            <div className="flex items-center justify-center gap-3 sm:gap-4">
+                <CountdownUnit value={time.days} label="DÍAS" />
+                <span className="text-2xl sm:text-4xl font-black text-white/5 mb-8">:</span>
+                <CountdownUnit value={time.hours} label="HORAS" />
+                <span className="text-2xl sm:text-4xl font-black text-white/5 mb-8">:</span>
+                <CountdownUnit value={time.minutes} label="MIN" />
+                <span className="text-2xl sm:text-4xl font-black text-white/5 mb-8">:</span>
+                <CountdownUnit value={time.seconds} label="SEG" />
             </div>
         </div>
     )

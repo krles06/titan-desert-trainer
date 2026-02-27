@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import CountdownTimer from '../components/CountdownTimer'
 import { Mountain, Bike, Brain, Calendar, TrendingUp, ChevronRight } from 'lucide-react'
+import { RACES } from '../lib/races'
 
 const features = [
     {
@@ -29,27 +30,27 @@ export default function Landing() {
             {/* Hero */}
             <section className="gradient-desert relative overflow-hidden px-4 pt-12 pb-16 sm:pt-16 sm:pb-20">
                 {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-titan-orange/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-titan-orange/5 rounded-full blur-2xl" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-blue/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-dunr-orange/5 rounded-full blur-2xl" />
 
                 <div className="relative max-w-lg mx-auto text-center">
-                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 mb-6">
-                        <Mountain size={14} className="text-titan-orange-light" />
-                        <span className="text-xs font-medium text-white/80">Škoda Morocco Titan Desert 2026</span>
+                    <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 mb-6">
+                        <Mountain size={14} className="text-dunr-blue" />
+                        <span className="text-xs font-medium text-white/80">{RACES[0].name} 2026</span>
                     </div>
 
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight mb-3">
-                        Titan Desert
-                        <span className="block text-titan-orange-light">Trainer</span>
+                    <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight mb-3 tracking-tighter">
+                        DUN
+                        <span className="text-dunr-orange">R</span>
                     </h1>
 
-                    <p className="text-white/70 text-base sm:text-lg mb-8 max-w-md mx-auto">
+                    <p className="text-white/90 text-base sm:text-lg mb-8 max-w-md mx-auto leading-relaxed">
                         Tu preparación personalizada para conquistar el desierto. Planes de entrenamiento con IA, adaptados a tu nivel.
                     </p>
 
                     {/* Countdown */}
                     <div className="mb-8">
-                        <CountdownTimer />
+                        <CountdownTimer targetDate={RACES[0].date} raceName={RACES[0].name} />
                     </div>
 
                     {/* CTA */}
@@ -65,7 +66,7 @@ export default function Landing() {
                                 </Link>
                                 <Link
                                     to="/login"
-                                    className="btn-secondary w-full sm:w-auto text-center !text-white !border-white/20 hover:!border-white/40 hover:!text-white"
+                                    className="btn-secondary w-full sm:w-auto text-center !bg-white/10 backdrop-blur-sm !text-white !border-white/20 hover:!bg-white/20 hover:!border-white/40 transition-all font-bold"
                                 >
                                     Ya tengo cuenta
                                 </Link>
@@ -103,7 +104,7 @@ export default function Landing() {
                 <div className="glass-card-dark p-6 text-center">
                     <Bike size={28} className="text-titan-orange-light mx-auto mb-3" />
                     <h3 className="text-lg font-bold text-white mb-2">26 abril — 1 mayo 2026</h3>
-                    <p className="text-white/60 text-sm">
+                    <p className="text-white/80 text-sm">
                         6 etapas · +600 km · Desierto del Sahara, Marruecos
                     </p>
                 </div>

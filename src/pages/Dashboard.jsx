@@ -6,29 +6,51 @@ import { supabase } from '../lib/supabase'
 import CountdownTimer from '../components/CountdownTimer'
 import {
     TrendingUp, Clock, Calendar, Flame, ChevronRight,
-    CheckCircle, Zap, Target
+    CheckCircle, Zap, Target, RefreshCw
 } from 'lucide-react'
+import { getRaceById } from '../lib/races'
 
 export default function Dashboard() {
     const { profile, user } = useAuth()
     const [sessions, setSessions] = useState([])
+    const [plan, setPlan] = useState(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        async function loadSessions() {
+        async function loadDashboardData() {
             if (DEMO_MODE) {
                 const saved = localStorage.getItem('demo_sessions')
                 setSessions(saved ? JSON.parse(saved) : DEMO_SESSIONS)
+                setPlan({
+                    plan_json: {
+                        advertencias: [
+                            { semana: 1, tipo: 'alerta_critica', mensaje: 'Trabajo hecho. Descansa y confía en el entrenamiento.' },
+                            { semana: 8, tipo: 'alerta_importante', mensaje: 'Momento del entrenamiento largo más exigente del plan.' }
+                        ]
+                    }
+                })
             } else {
-                const { data } = await supabase
+                // Fetch sessions
+                const { data: sessionData } = await supabase
                     .from('sessions')
                     .select('*')
                     .order('fecha', { ascending: true })
-                setSessions(data || [])
+                setSessions(sessionData || [])
+
+                // Fetch active plan to get advertencias
+                const { data: planData } = await supabase
+                    .from('training_plans')
+                    .select('*')
+                    .eq('activo', true)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single()
+
+                if (planData) setPlan(planData)
             }
             setLoading(false)
         }
-        loadSessions()
+        loadDashboardData()
     }, [user])
 
     const stats = useMemo(() => {
@@ -45,7 +67,7 @@ export default function Dashboard() {
 
         const hoursTotal = sessions
             .filter((s) => s.completada)
-            .reduce((sum, s) => sum + (s.duracion_min || 0), 0) / 60
+            .reduce((sum, s) => sum + (s.duracion_real || s.duracion_min || 0), 0) / 60
 
         // Calculate streak
         const today = new Date().toISOString().split('T')[0]
@@ -75,27 +97,39 @@ export default function Dashboard() {
             (s) => !s.completada && s.fecha >= today
         )
 
-        // Plan readjustment logic
+        // Plan readjustment logic (based on new 1-10 RPE scale)
         let needsReadjustment = null
         const recentSessions = sessions
-            .filter((s) => s.completada && s.dificultad_percibida)
+            .filter((s) => s.completada && s.percepcion_esfuerzo)
             .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
             .slice(0, 3)
 
         if (recentSessions.length >= 3) {
-            const hardCount = recentSessions.filter(s => s.dificultad_percibida === 'muy_dificil').length
-            const easyCount = recentSessions.filter(s => s.dificultad_percibida === 'muy_facil').length
+            const highEffortCount = recentSessions.filter(s => s.percepcion_esfuerzo >= 8).length
+            const lowEffortCount = recentSessions.filter(s => s.percepcion_esfuerzo <= 3).length
 
-            if (hardCount >= 2) needsReadjustment = 'hard'
-            else if (easyCount >= 2) needsReadjustment = 'easy'
+            if (highEffortCount >= 3) needsReadjustment = 'hard'
+            else if (lowEffortCount >= 3) needsReadjustment = 'easy'
         }
 
-        return { total, completed, percentComplete, weeks, weeksCompleted, hoursTotal, streak, nextSession, needsReadjustment }
-    }, [sessions])
+        // Active coaching warnings logic
+        const race = getRaceById(profile?.carrera_id)
+        let activeWarnings = []
+        if (plan?.plan_json?.advertencias && race) {
+            const raceDate = new Date(race.date + 'T00:00:00')
+            const now = new Date()
+            const diffTime = raceDate - now
+            const weeksRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)))
+
+            activeWarnings = plan.plan_json.advertencias.filter(a => a.semana === weeksRemaining)
+        }
+
+        return { total, completed, percentComplete, weeks, weeksCompleted, hoursTotal, streak, nextSession, needsReadjustment, activeWarnings }
+    }, [sessions, plan, profile])
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-titan-sand-light pb-24 px-4 pt-6">
+            <div className="min-h-screen bg-dunr-black pb-24 px-4 pt-6">
                 <div className="max-w-lg mx-auto space-y-4">
                     <div className="skeleton h-20 w-full" />
                     <div className="grid grid-cols-2 gap-3">
@@ -111,124 +145,196 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-titan-sand-light pb-24">
+        <div className="min-h-screen bg-dunr-black pb-24">
             {/* Header */}
             <div className="gradient-desert px-4 pt-6 pb-10">
                 <div className="max-w-lg mx-auto">
                     <p className="text-white/60 text-sm mb-1">¡Hola, {profile?.nombre?.split(' ')[0] || 'ciclista'}!</p>
                     <h1 className="text-2xl font-bold text-white mb-4">Tu preparación</h1>
-                    <CountdownTimer mini />
+                    <CountdownTimer
+                        mini
+                        targetDate={getRaceById(profile?.carrera_id).date}
+                        raceName={getRaceById(profile?.carrera_id).name}
+                    />
                 </div>
             </div>
+
+            {/* Phase 1 Warning */}
+            {new URLSearchParams(window.location.search).get('phase1') === 'true' && (
+                <div className="px-4 mt-4 animate-fade-in">
+                    <div className="glass-card border-dunr-blue/30 bg-dunr-blue/5 p-4 flex gap-3 items-center">
+                        <div className="w-10 h-10 rounded-xl bg-dunr-blue/20 flex items-center justify-center text-dunr-blue shrink-0">
+                            <Zap size={20} />
+                        </div>
+                        <div>
+                            <p className="text-xs font-black text-white uppercase tracking-wider mb-0.5">Plan de Fase 1 Generado</p>
+                            <p className="text-[10px] text-white/60 leading-tight">Tu carrera aún está lejos. Hemos creado las primeras 12 semanas para máxima precisión.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Stats */}
             <div className="px-4 -mt-4 max-w-lg mx-auto">
                 {stats && (
                     <>
+                        {/* Coaching Warnings */}
+                        {stats.activeWarnings?.map((warning, idx) => (
+                            <div
+                                key={idx}
+                                className={`glass-card p-4 mb-4 animate-fade-in flex gap-4 items-start border-l-4 ${warning.tipo === 'alerta_critica'
+                                    ? 'border-titan-danger bg-titan-danger/5'
+                                    : warning.tipo === 'alerta_importante'
+                                        ? 'border-dunr-orange bg-dunr-orange/5'
+                                        : 'border-dunr-blue bg-dunr-blue/5'
+                                    }`}
+                            >
+                                <div className={`p-2 rounded-xl h-fit ${warning.tipo === 'alerta_critica'
+                                    ? 'bg-titan-danger/20 text-titan-danger'
+                                    : warning.tipo === 'alerta_importante'
+                                        ? 'bg-dunr-orange/20 text-dunr-orange'
+                                        : 'bg-dunr-blue/20 text-dunr-blue'
+                                    }`}>
+                                    <TrendingUp size={20} />
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Notificación DUNR</h3>
+                                        <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${warning.tipo === 'alerta_critica' ? 'bg-titan-danger' : warning.tipo === 'alerta_importante' ? 'bg-dunr-orange' : 'bg-dunr-blue'}`} />
+                                    </div>
+                                    <p className="text-sm font-bold text-white leading-tight">{warning.mensaje}</p>
+                                </div>
+                            </div>
+                        ))}
+
                         {/* Readjustment Alert */}
                         {stats.needsReadjustment && (
-                            <div className="glass-card border-titan-orange bg-titan-orange/10 p-4 mb-4 animate-fade-in flex flex-col gap-3">
+                            <div className="glass-card border-dunr-orange bg-dunr-orange/5 p-4 mb-4 animate-fade-in flex flex-col gap-3">
                                 <div className="flex gap-3">
-                                    <div className="bg-titan-orange/20 p-2 rounded-full h-fit">
-                                        <TrendingUp size={20} className="text-titan-orange" />
+                                    <div className="bg-dunr-orange/20 p-2 rounded-full h-fit">
+                                        <TrendingUp size={20} className="text-dunr-orange" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-titan-blue text-sm">
-                                            {stats.needsReadjustment === 'hard'
-                                                ? '¿El plan es muy exigente?'
-                                                : '¿El plan es muy fácil?'}
+                                        <h3 className="font-bold text-white text-sm">
+                                            Tu rendimiento sugiere ajustes
                                         </h3>
-                                        <p className="text-xs text-titan-blue/60 mt-1">
-                                            Hemos notado que tus últimas sesiones han sido
-                                            {stats.needsReadjustment === 'hard' ? ' muy difíciles. ' : ' muy fáciles. '}
-                                            Podemos adaptar el plan para que se ajuste mejor a tu nivel actual.
+                                        <p className="text-white/60 text-xs">
+                                            Hemos detectado inconsistencias en tus últimos entrenos.
                                         </p>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => window.location.href = '/generate-plan'}
-                                    className="btn-primary w-full text-xs py-2"
+                                <Link to={`/generate-plan?reason=${stats.needsReadjustment}`} className="btn-primary w-full py-2.5 text-xs shadow-none">
+                                    Recalcular macrociclo con DUNR
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* Next session - HIGHER PROMINENCE */}
+                        {stats.nextSession ? (
+                            <div className="mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                                <div className="flex items-center gap-2 mb-3 px-1">
+                                    <Zap size={16} className="text-dunr-blue" />
+                                    <span className="text-xs font-bold text-white/90 uppercase tracking-wider">Próxima sesión</span>
+                                </div>
+                                <Link
+                                    to={`/session/${stats.nextSession.id}`}
+                                    className="block glass-card p-6 hover:scale-[1.01] transition-transform shadow-xl shadow-dunr-blue/5 border-l-4 border-l-dunr-blue"
                                 >
-                                    Adaptar plan con IA
-                                </button>
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div>
+                                            <h3 className="text-xl font-black text-white capitalize mb-1">
+                                                {stats.nextSession.tipo}
+                                            </h3>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] bg-dunr-blue text-white px-2 py-0.5 rounded-full font-bold uppercase">
+                                                    Semana {stats.nextSession.semana}
+                                                </span>
+                                                <span className="text-xs text-white/40">{stats.nextSession.dia_semana}</span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-white/10 p-2 rounded-xl">
+                                            <ChevronRight size={20} className="text-white" />
+                                        </div>
+                                    </div>
+
+                                    <p className="text-sm text-white/60 mb-5 leading-relaxed">
+                                        {stats.nextSession.descripcion}
+                                    </p>
+
+                                    <div className="grid grid-cols-3 gap-2 py-3 border-t border-white/10">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] text-white/30 uppercase font-bold">Tiempo</span>
+                                            <span className="text-sm text-white font-medium">{stats.nextSession.duracion_min} min</span>
+                                        </div>
+                                        <div className="flex flex-col border-l border-white/10 pl-3">
+                                            <span className="text-[10px] text-white/30 uppercase font-bold">Distancia</span>
+                                            <span className="text-sm text-white font-medium">{stats.nextSession.distancia_km} km</span>
+                                        </div>
+                                        <div className="flex flex-col border-l border-white/10 pl-3">
+                                            <span className="text-[10px] text-white/30 uppercase font-bold">Zona</span>
+                                            <span className="text-sm text-white font-medium">Z{stats.nextSession.intensidad_zona}</span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="glass-card p-8 mb-6 text-center animate-fade-in border-dashed">
+                                <Target size={40} className="mx-auto text-white/10 mb-4" />
+                                <h3 className="text-lg font-bold text-white mb-2">¿Aún no tienes plan?</h3>
+                                <p className="text-sm text-white/50 mb-6 max-w-[200px] mx-auto">
+                                    Genera tu entrenamiento para empezar la aventura con DUNR.
+                                </p>
+                                <Link to="/onboarding" className="btn-primary w-full block">
+                                    Crear mi plan con IA
+                                </Link>
                             </div>
                         )}
 
                         {/* Progress bar */}
-                        <div className="glass-card p-5 mb-4 animate-fade-in">
+                        <div className="glass-card p-5 mb-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium text-titan-blue/70">Progreso del plan</span>
-                                <span className="text-2xl font-bold text-titan-orange">{stats.percentComplete}%</span>
+                                <span className="text-sm font-medium text-white/60">Progreso total</span>
+                                <span className="text-2xl font-black text-dunr-orange">{stats.percentComplete}%</span>
                             </div>
-                            <div className="w-full bg-titan-sand-dark/50 rounded-full h-3 overflow-hidden">
+                            <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden">
                                 <div
-                                    className="h-full bg-gradient-to-r from-titan-orange to-titan-orange-light rounded-full transition-all duration-1000 ease-out"
+                                    className="h-full bg-gradient-to-r from-dunr-blue to-dunr-orange rounded-full transition-all duration-1000 ease-out"
                                     style={{ width: `${stats.percentComplete}%` }}
                                 />
                             </div>
-                            <p className="text-xs text-titan-blue/40 mt-1.5">
-                                {stats.completed} de {stats.total} sesiones completadas
+                            <p className="text-[10px] text-white/40 mt-2 font-bold uppercase tracking-wider">
+                                {stats.completed} de {stats.total} SESIONES COMPLETADAS
                             </p>
                         </div>
 
                         {/* Stat cards */}
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                            <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                                <Calendar size={20} className="text-titan-orange mb-2" />
-                                <p className="text-2xl font-bold text-titan-blue">{stats.weeksCompleted}<span className="text-sm font-normal text-titan-blue/40">/{stats.weeks}</span></p>
-                                <p className="text-xs text-titan-blue/50">Semanas</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                                <Calendar size={18} className="text-dunr-blue mb-2" />
+                                <p className="text-2xl font-black text-white">{stats.weeksCompleted}<span className="text-xs font-normal text-white/30 ml-1">/{stats.weeks}</span></p>
+                                <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Semanas</p>
                             </div>
-                            <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.15s' }}>
-                                <Flame size={20} className="text-titan-orange mb-2" />
-                                <p className="text-2xl font-bold text-titan-blue">{stats.streak}</p>
-                                <p className="text-xs text-titan-blue/50">Días de racha</p>
+                            <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.35s' }}>
+                                <Flame size={18} className="text-dunr-orange mb-2" />
+                                <p className="text-2xl font-black text-white">{stats.streak}</p>
+                                <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Días racha</p>
                             </div>
-                            <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                                <Clock size={20} className="text-titan-orange mb-2" />
-                                <p className="text-2xl font-bold text-titan-blue">{Math.round(stats.hoursTotal)}<span className="text-sm font-normal text-titan-blue/40">h</span></p>
-                                <p className="text-xs text-titan-blue/50">Horas entrenadas</p>
+                            <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                                <Clock size={12} className="text-dunr-blue mb-2" />
+                                <p className="text-xl font-black text-white">{Math.round(stats.hoursTotal)}<span className="text-xs font-normal text-white/30 ml-1">h</span></p>
+                                <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Entrenado</p>
                             </div>
-                            <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.25s' }}>
-                                <CheckCircle size={20} className="text-titan-success mb-2" />
-                                <p className="text-2xl font-bold text-titan-blue">{stats.completed}</p>
-                                <p className="text-xs text-titan-blue/50">Sesiones hechas</p>
+                            <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.45s' }}>
+                                <CheckCircle size={18} className="text-titan-success mb-2" />
+                                <p className="text-xl font-black text-white">{stats.completed}</p>
+                                <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Hechas</p>
                             </div>
                         </div>
 
-                        {/* Next session */}
-                        {stats.nextSession && (
-                            <Link
-                                to={`/session/${stats.nextSession.id}`}
-                                className="block glass-card-dark p-5 animate-fade-in hover:scale-[1.01] transition-transform"
-                                style={{ animationDelay: '0.3s' }}
-                            >
-                                <div className="flex items-center justify-between mb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Zap size={16} className="text-titan-orange-light" />
-                                        <span className="text-sm font-medium text-white/70">Próxima sesión</span>
-                                    </div>
-                                    <ChevronRight size={18} className="text-white/40" />
-                                </div>
-                                <h3 className="text-lg font-bold text-white mb-1 capitalize">
-                                    {stats.nextSession.tipo}
-                                </h3>
-                                <p className="text-sm text-white/50 mb-3">{stats.nextSession.descripcion}</p>
-                                <div className="flex items-center gap-4 text-xs text-white/40">
-                                    <span className="flex items-center gap-1">
-                                        <Clock size={12} /> {stats.nextSession.duracion_min} min
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <Target size={12} /> {stats.nextSession.distancia_km} km
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <TrendingUp size={12} /> Zona {stats.nextSession.intensidad_zona}
-                                    </span>
-                                </div>
-                            </Link>
-                        )}
+                        <div className="mt-8 mb-4 border-t border-white/5 opacity-50" />
                     </>
                 )}
             </div>
-        </div>
+        </div >
     )
 }

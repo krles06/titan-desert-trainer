@@ -11,6 +11,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
     const [profile, setProfile] = useState(null)
+    const [hasActivePlan, setHasActivePlan] = useState(false)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -40,11 +41,14 @@ export function AuthProvider({ children }) {
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            console.log('Auth state change:', _event, session?.user?.id)
             setUser(session?.user ?? null)
             if (session?.user) {
+                setLoading(true) // Ensure we show loading while fetching profile
                 fetchProfile(session.user.id)
             } else {
                 setProfile(null)
+                setHasActivePlan(false)
                 setLoading(false)
             }
         })
@@ -53,19 +57,27 @@ export function AuthProvider({ children }) {
     }, [])
 
     async function fetchProfile(userId) {
+        setLoading(true)
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single()
+            console.log('Fetching profile and plan for:', userId)
+            // Fetch profile and check for active plan in parallel
+            const [profileRes, planRes] = await Promise.all([
+                supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+                supabase.from('training_plans').select('id').eq('user_id', userId).eq('activo', true).limit(1)
+            ])
 
-            if (error && error.code !== 'PGRST116') {
-                console.error('Error fetching profile:', error)
+            if (profileRes.error && profileRes.error.code !== 'PGRST116') {
+                console.error('Error fetching profile:', profileRes.error)
             }
-            setProfile(data || null)
+
+            setProfile(profileRes.data || null)
+            setHasActivePlan(!!planRes.data && planRes.data.length > 0)
+
+            if (profileRes.data) {
+                console.log('Profile found for user:', userId, '| Active plan:', !!planRes.data?.length)
+            }
         } catch (err) {
-            console.error('Error:', err)
+            console.error('Error in fetchProfile:', err)
         } finally {
             setLoading(false)
         }
@@ -101,8 +113,11 @@ export function AuthProvider({ children }) {
             localStorage.removeItem('demo_profile')
             setUser(null)
             setProfile(null)
+            setHasActivePlan(false)
             return
         }
+        setProfile(null)
+        setHasActivePlan(false)
         await supabase.auth.signOut()
     }
 
@@ -123,16 +138,22 @@ export function AuthProvider({ children }) {
         }
         const { data, error } = await supabase
             .from('profiles')
-            .upsert({ ...profileData, id: user.id, subscription_status: 'active' })
+            .upsert({ ...profileData, id: user.id })
             .select()
             .single()
-        if (!error) setProfile(data)
+
+        if (error) {
+            console.error('Error in saveProfile:', error)
+        } else {
+            setProfile(data)
+        }
         return { data, error }
     }
 
     const value = {
         user,
         profile,
+        hasActivePlan,
         loading,
         signUp,
         signIn,
@@ -141,6 +162,7 @@ export function AuthProvider({ children }) {
         saveProfile,
         isAuthenticated: !!user,
         hasProfile: !!profile,
+        setHasActivePlan, // Allow manual update after generation
     }
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
