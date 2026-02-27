@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
     User, Mail, Activity, Mountain, LogOut,
-    RefreshCw, ChevronRight, Save, Shield
+    RefreshCw, ChevronRight, Save, Shield, Info
 } from 'lucide-react'
 
 export default function Profile() {
@@ -230,6 +230,14 @@ export default function Profile() {
                             <LogOut size={20} />
                         </div>
                         <span className="text-xs font-black uppercase tracking-widest text-titan-danger flex-1 text-left">Cerrar sesión</span>
+                    </button>
+                    <div className="h-px bg-white/5" />
+                    <button
+                        onClick={() => navigate('/legal')}
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors group opacity-60"
+                    >
+                        <Info size={18} className="text-white/40" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Información Legal</span>
                     </button>
                 </div>
 

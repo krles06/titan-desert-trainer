@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import CountdownTimer from '../components/CountdownTimer'
-import { Mountain, Bike, Brain, Calendar, TrendingUp, ChevronRight } from 'lucide-react'
+import CookieBanner from '../components/CookieBanner'
+import { Mountain, Bike, Brain, Calendar, TrendingUp, ChevronRight, Info } from 'lucide-react'
 import { RACES } from '../lib/races'
 
 const features = [
@@ -27,6 +28,7 @@ export default function Landing() {
 
     return (
         <div className="min-h-screen flex flex-col">
+            <CookieBanner />
             {/* Hero */}
             <section className="gradient-desert relative overflow-hidden px-4 pt-12 pb-16 sm:pt-16 sm:pb-20">
                 {/* Decorative elements */}
@@ -100,7 +102,7 @@ export default function Landing() {
             </section>
 
             {/* Event details */}
-            <section className="px-4 pb-12 max-w-lg mx-auto w-full">
+            <section className="px-4 pb-20 max-w-lg mx-auto w-full">
                 <div className="glass-card-dark p-6 text-center">
                     <Bike size={28} className="text-titan-orange-light mx-auto mb-3" />
                     <h3 className="text-lg font-bold text-white mb-2">26 abril — 1 mayo 2026</h3>
@@ -109,6 +111,20 @@ export default function Landing() {
                     </p>
                 </div>
             </section>
+
+            {/* Simple Footer */}
+            <footer className="mt-auto px-4 py-8 border-t border-white/5 text-center">
+                <div className="max-w-lg mx-auto">
+                    <Link
+                        to="/legal"
+                        className="inline-flex items-center gap-2 text-white/20 hover:text-dunr-blue transition-colors text-[10px] font-black uppercase tracking-widest"
+                    >
+                        <Info size={12} />
+                        Información Legal
+                    </Link>
+                    <p className="text-[8px] text-white/10 mt-4 font-black uppercase tracking-[0.3em]">DUNR © 2026</p>
+                </div>
+            </footer>
         </div>
     )
 }

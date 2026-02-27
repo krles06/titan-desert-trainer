@@ -15,6 +15,7 @@ import CalendarPage from './pages/Calendar'
 import SessionDetail from './pages/SessionDetail'
 import Profile from './pages/Profile'
 import Subscription from './pages/Subscription'
+import Legal from './pages/Legal'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/legal" element={<Legal />} />
 
             {/* Protected routes */}
             <Route path="/onboarding" element={
