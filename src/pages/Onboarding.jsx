@@ -63,6 +63,7 @@ export default function Onboarding() {
         minutos_dia: 60,
         participado_antes: false,
         dias_preferidos: [], // ['Lunes', 'Miércoles', ...]
+        dia_fuerte: '',
     })
 
     function update(field, value) {
@@ -92,6 +93,9 @@ export default function Onboarding() {
         } else if (s === 4) {
             if (form.dias_preferidos.length !== form.dias_entreno_semana) {
                 newErrors.dias_preferidos = `Selecciona exactamente ${form.dias_entreno_semana} días`
+            }
+            if (!form.dia_fuerte) {
+                newErrors.dia_fuerte = 'Selecciona tu día fuerte'
             }
         }
         setErrors(newErrors)
@@ -375,7 +379,12 @@ export default function Onboarding() {
                                                 onClick={() => {
                                                     const current = [...form.dias_preferidos]
                                                     if (isSelected) {
-                                                        update('dias_preferidos', current.filter((d) => d !== dia))
+                                                        const next = current.filter((d) => d !== dia)
+                                                        update('dias_preferidos', next)
+                                                        // Reset dia_fuerte if the selected day is removed
+                                                        if (form.dia_fuerte === dia) {
+                                                            update('dia_fuerte', '')
+                                                        }
                                                     } else if (current.length < form.dias_entreno_semana) {
                                                         update('dias_preferidos', [...current, dia])
                                                     }
@@ -390,6 +399,41 @@ export default function Onboarding() {
                                         )
                                     })}
                                 </div>
+
+                                {form.dias_preferidos.length === form.dias_entreno_semana && (
+                                    <div className="mt-10 pt-10 border-t border-white/5 animate-fade-in">
+                                        <h3 className="text-xl font-black text-white tracking-tight leading-none uppercase mb-2">¿Cuál es tu día fuerte?</h3>
+                                        <p className="text-[11px] text-white/40 mb-6 font-medium leading-relaxed">
+                                            El día en que tienes <strong>más tiempo y energía</strong> para los entrenamientos más exigentes:
+                                        </p>
+
+                                        {errors.dia_fuerte && (
+                                            <p className="text-[10px] text-titan-danger mb-4 font-bold uppercase tracking-wider ml-1">
+                                                {errors.dia_fuerte}
+                                            </p>
+                                        )}
+
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                            {form.dias_preferidos.map((dia) => {
+                                                const isStrong = form.dia_fuerte === dia
+                                                return (
+                                                    <button
+                                                        key={`strong-${dia}`}
+                                                        type="button"
+                                                        onClick={() => update('dia_fuerte', dia)}
+                                                        className={`py-3 px-2 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all ${isStrong
+                                                            ? 'border-dunr-orange bg-dunr-orange text-white shadow-xl shadow-dunr-orange/20'
+                                                            : 'border-white/5 bg-white/5 text-white/30 hover:border-white/20'
+                                                            }`}
+                                                    >
+                                                        {dia}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <p className="text-[10px] text-white/20 mt-6 text-center italic font-medium">
                                     Si eliges descansar algún día, la IA de DUNR lo tendrá en cuenta.
                                 </p>

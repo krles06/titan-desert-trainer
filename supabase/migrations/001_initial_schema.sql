@@ -57,9 +57,9 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 
 -- Indexes
-CREATE INDEX idx_sessions_plan_id ON sessions(plan_id);
-CREATE INDEX idx_sessions_fecha ON sessions(fecha);
-CREATE INDEX idx_training_plans_user_id ON training_plans(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_plan_id ON sessions(plan_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_fecha ON sessions(fecha);
+CREATE INDEX IF NOT EXISTS idx_training_plans_user_id ON training_plans(user_id);
 
 -- Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -67,34 +67,49 @@ ALTER TABLE training_plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: users can only CRUD their own profile
-CREATE POLICY "Users can view own profile"
-  ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can insert own profile"
-  ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
-CREATE POLICY "Users can update own profile"
-  ON profiles FOR UPDATE USING (auth.uid() = id);
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can view own profile' AND tablename = 'profiles') THEN
+        CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can insert own profile' AND tablename = 'profiles') THEN
+        CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can update own profile' AND tablename = 'profiles') THEN
+        CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+    END IF;
+END $$;
 
 -- Training plans: users can only access their own plans
-CREATE POLICY "Users can view own plans"
-  ON training_plans FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own plans"
-  ON training_plans FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own plans"
-  ON training_plans FOR UPDATE USING (auth.uid() = user_id);
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can view own plans' AND tablename = 'training_plans') THEN
+        CREATE POLICY "Users can view own plans" ON training_plans FOR SELECT USING (auth.uid() = user_id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can insert own plans' AND tablename = 'training_plans') THEN
+        CREATE POLICY "Users can insert own plans" ON training_plans FOR INSERT WITH CHECK (auth.uid() = user_id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can update own plans' AND tablename = 'training_plans') THEN
+        CREATE POLICY "Users can update own plans" ON training_plans FOR UPDATE USING (auth.uid() = user_id);
+    END IF;
+END $$;
 
 -- Sessions: users can access sessions from their own plans
-CREATE POLICY "Users can view own sessions"
-  ON sessions FOR SELECT USING (
-    plan_id IN (SELECT id FROM training_plans WHERE user_id = auth.uid())
-  );
-CREATE POLICY "Users can update own sessions"
-  ON sessions FOR UPDATE USING (
-    plan_id IN (SELECT id FROM training_plans WHERE user_id = auth.uid())
-  );
-CREATE POLICY "Users can insert own sessions"
-  ON sessions FOR INSERT WITH CHECK (
-    plan_id IN (SELECT id FROM training_plans WHERE user_id = auth.uid())
-  );
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can view own sessions' AND tablename = 'sessions') THEN
+        CREATE POLICY "Users can view own sessions" ON sessions FOR SELECT USING (
+            plan_id IN (SELECT id FROM training_plans WHERE user_id = auth.uid())
+        );
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can update own sessions' AND tablename = 'sessions') THEN
+        CREATE POLICY "Users can update own sessions" ON sessions FOR UPDATE USING (
+            plan_id IN (SELECT id FROM training_plans WHERE user_id = auth.uid())
+        );
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can insert own sessions' AND tablename = 'sessions') THEN
+        CREATE POLICY "Users can insert own sessions" ON sessions FOR INSERT WITH CHECK (
+            plan_id IN (SELECT id FROM training_plans WHERE user_id = auth.uid())
+        );
+    END IF;
+END $$;
 
 -- Function to auto-update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at()
@@ -105,10 +120,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
 CREATE TRIGGER update_profiles_updated_at
   BEFORE UPDATE ON profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+DROP TRIGGER IF EXISTS update_sessions_updated_at ON sessions;
 CREATE TRIGGER update_sessions_updated_at
   BEFORE UPDATE ON sessions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();

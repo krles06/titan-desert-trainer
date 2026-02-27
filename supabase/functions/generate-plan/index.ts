@@ -55,13 +55,18 @@ Deno.serve(async (req) => {
         const systemPrompt = `Entrenador de ciclismo experto en MTB y carreras por etapas como la Titan Desert. 
 Genera un plan de entrenamiento de ${totalWeeks} semanas para la carrera ${race.name}.
 
-REGLAS CRÍTICAS:
+REGLAS CRÍTICAS DE PLANIFICACIÓN:
 - LAS SESIONES DEBEN EXPLICAR EXACTAMENTE CÓMO EJECUTAR EL ENTRENAMIENTO.
-- NINGUNA SESIÓN PUEDE TENER UNA FECHA IGUAL O POSTERIOR AL ${race.date} (Día de la carrera). La última sesión debe ser el día anterior.
+- NINGUNA SESIÓN puede programarse en la fecha exacta de la carrera (${race.date}) ni después.
+- La ÚLTIMA SESIÓN del plan debe ser al menos 2 DÍAS ANTES de la fecha de la carrera para asegurar el tapering.
+- PRIORIDAD "DÍA FUERTE": El día marcado como "${profile.dia_fuerte}" en el perfil debe tener siempre la sesión más exigente de la semana (Largo o Intervalos).
+- FRECUENCIA DE DESCANSO ACTIVO: Solo deben aparecer cada 3 o 4 semanas, nunca en semanas consecutivas.
+- PROGRESIÓN DE RODAJES: La distancia de los rodajes debe aumentarse progresivamente cada semana. Nunca repitas la misma distancia dos semanas consecutivas.
 - EL PLAN EMPIEZA HOY: ${todayStr}.
 - Genera una sesión para cada día de entrenamiento solicitado: ${profile.dias_preferidos?.join(', ') || 'Lunes, Miércoles, Viernes, Domingo'}.
 - Tipos de sesión: 'rodaje', 'intervalos', 'fuerza', 'descanso activo', 'largo'.
-- DESCRIPCIONES DETALLADAS OBLIGATORIAS:
+
+DESCRIPCIONES DETALLADAS OBLIGATORIAS:
   - Para INTERVALOS: Escribe el calentamiento, las series exactas con su duración e intensidad, y el tiempo de recuperación exacto entre series.
   - Para FUERZA: Escribe la pendiente buscada (en %), desarrollos (marchas) recomendados, número de repeticiones y recuperación.
   - Para LARGO: Indica zona de intensidad, técnica de pedaleo y consejos precisos de nutrición e hidratación.
@@ -74,7 +79,7 @@ REGLAS CRÍTICAS:
   "advertencias": [{"semana": int, "tipo": "alerta_media", "mensaje": string}]
 }`;
 
-        const userPrompt = `Usuario: ${profile.nombre}, Nivel: ${profile.nivel_experiencia}. INICIO: ${todayStr}. ${isPhase1 ? 'GENERAR SOLO PRIMERAS 12 SEMANAS.' : ''}`;
+        const userPrompt = `Usuario: ${profile.nombre}, Nivel: ${profile.nivel_experiencia}, Día fuerte: ${profile.dia_fuerte}. INICIO: ${todayStr}. ${isPhase1 ? 'GENERAR SOLO PRIMERAS 12 SEMANAS.' : ''}`;
 
         const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
             method: 'POST',
