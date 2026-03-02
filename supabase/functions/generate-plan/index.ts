@@ -38,8 +38,20 @@ Deno.serve(async (req) => {
             { id: 'morocco-2026', name: 'Škoda Morocco Titan Desert', date: '2026-04-26' },
             { id: 'almeria-2026', name: 'Titan Desert Almería', date: '2026-10-01' }
         ]
-        const race = RACES.find(r => r.id === profile.carrera_id) || RACES[0]
-        const raceDate = new Date(race.date)
+
+        let raceName = ''
+        let raceDateStr = ''
+
+        if (profile.carrera_id === 'custom') {
+            raceName = `Objetivo Personalizado (${profile.objetivo_distancia}km, ${profile.objetivo_desnivel}m de desnivel, terreno: ${profile.objetivo_terreno})`
+            raceDateStr = profile.objetivo_fecha
+        } else {
+            const race = RACES.find(r => r.id === profile.carrera_id) || RACES[0]
+            raceName = race.name
+            raceDateStr = race.date
+        }
+
+        const raceDate = new Date(raceDateStr)
 
         // Calculate weeks until race
         const diffTime = raceDate.getTime() - today.getTime()
@@ -53,12 +65,12 @@ Deno.serve(async (req) => {
         }
 
         const systemPrompt = `Entrenador de ciclismo experto en MTB y carreras por etapas como la Titan Desert. 
-Genera un plan de entrenamiento de ${totalWeeks} semanas para la carrera ${race.name}.
+Genera un plan de entrenamiento de ${totalWeeks} semanas para la carrera o reto: ${raceName}.
 
 REGLAS CRÍTICAS DE PLANIFICACIÓN:
 - LAS SESIONES DEBEN EXPLICAR EXACTAMENTE CÓMO EJECUTAR EL ENTRENAMIENTO.
-- NINGUNA SESIÓN puede programarse en la fecha exacta de la carrera (${race.date}) ni después.
-- La ÚLTIMA SESIÓN del plan debe ser al menos 2 DÍAS ANTES de la fecha de la carrera para asegurar el tapering.
+- NINGUNA SESIÓN puede programarse en la fecha exacta del evento (${raceDateStr}) ni después.
+- La ÚLTIMA SESIÓN del plan debe ser al menos 2 DÍAS ANTES de la fecha del evento para asegurar el tapering.
 - PRIORIDAD "DÍA FUERTE": El día marcado como "${profile.dia_fuerte}" en el perfil debe tener siempre la sesión más exigente de la semana (Largo o Intervalos).
 - FRECUENCIA DE DESCANSO ACTIVO: Solo deben aparecer cada 3 o 4 semanas, nunca en semanas consecutivas.
 - PROGRESIÓN DE RODAJES: La distancia de los rodajes debe aumentarse progresivamente cada semana. Nunca repitas la misma distancia dos semanas consecutivas.
@@ -79,7 +91,10 @@ DESCRIPCIONES DETALLADAS OBLIGATORIAS:
   "advertencias": [{"semana": int, "tipo": "alerta_media", "mensaje": string}]
 }`;
 
-        const userPrompt = `Usuario: ${profile.nombre}, Nivel: ${profile.nivel_experiencia}, Día fuerte: ${profile.dia_fuerte}. INICIO: ${todayStr}. ${isPhase1 ? 'GENERAR SOLO PRIMERAS 12 SEMANAS.' : ''}`;
+        const userPrompt = `Usuario: ${profile.nombre}, Nivel: ${profile.nivel_experiencia}, Día fuerte: ${profile.dia_fuerte}. 
+INICIO: ${todayStr}. 
+OBJETIVO: ${raceName}. 
+${isPhase1 ? 'GENERAR SOLO PRIMERAS 12 SEMANAS.' : ''}`;
 
         const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
             method: 'POST',

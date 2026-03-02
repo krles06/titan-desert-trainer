@@ -64,6 +64,10 @@ export default function Onboarding() {
         participado_antes: false,
         dias_preferidos: [], // ['Lunes', 'Miércoles', ...]
         dia_fuerte: '',
+        objetivo_distancia: '',
+        objetivo_desnivel: '',
+        objetivo_fecha: '',
+        objetivo_terreno: 'mtb',
     })
 
     function update(field, value) {
@@ -75,6 +79,16 @@ export default function Onboarding() {
         const newErrors = {}
         if (s === 0) {
             if (!form.carrera_id) newErrors.carrera_id = 'Selecciona un reto'
+            if (form.carrera_id === 'custom') {
+                if (!form.objetivo_distancia || form.objetivo_distancia < 1) newErrors.objetivo_distancia = 'Distancia mínima 1 km'
+                if (!form.objetivo_desnivel || form.objetivo_desnivel < 0) newErrors.objetivo_desnivel = 'Desnivel no válido'
+                if (!form.objetivo_fecha) newErrors.objetivo_fecha = 'Selecciona una fecha'
+                else {
+                    const selected = new Date(form.objetivo_fecha)
+                    const now = new Date()
+                    if (selected <= now) newErrors.objetivo_fecha = 'La fecha debe ser futura'
+                }
+            }
         } else if (s === 1) {
             if (!form.nombre.trim()) newErrors.nombre = 'Introduce tu nombre'
             if (!form.edad || form.edad < 16 || form.edad > 80) newErrors.edad = 'Edad entre 16 y 80'
@@ -133,6 +147,10 @@ export default function Onboarding() {
                 fc_reposo: Number(form.fc_reposo),
                 dias_entreno_semana: Number(form.dias_entreno_semana),
                 minutos_dia: Number(form.minutos_dia),
+                objetivo_distancia: form.carrera_id === 'custom' ? Number(form.objetivo_distancia) : null,
+                objetivo_desnivel: form.carrera_id === 'custom' ? Number(form.objetivo_desnivel) : null,
+                objetivo_fecha: form.carrera_id === 'custom' ? form.objetivo_fecha : null,
+                objetivo_terreno: form.carrera_id === 'custom' ? form.objetivo_terreno : null,
                 subscription_status: 'trialing',
             }
             const { error: saveError } = await saveProfile(profileData)
@@ -244,6 +262,68 @@ export default function Onboarding() {
                                         )}
                                     </button>
                                 ))}
+
+                                {/* Custom Objective Option */}
+                                <button
+                                    type="button"
+                                    onClick={() => update('carrera_id', 'custom')}
+                                    className={`w-full text-left p-5 rounded-2xl border-2 transition-all relative overflow-hidden group ${form.carrera_id === 'custom'
+                                        ? 'border-dunr-orange bg-dunr-orange/5 shadow-2xl shadow-dunr-orange/10'
+                                        : 'border-white/5 bg-white/5 hover:border-white/20'
+                                        }`}
+                                >
+                                    <div className="relative z-10">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div>
+                                                <h3 className={`font-black text-lg tracking-tight transition-colors ${form.carrera_id === 'custom' ? 'text-dunr-orange' : 'text-white'}`}>
+                                                    OBJETIVO PERSONALIZADO
+                                                </h3>
+                                                <p className="text-[10px] text-white/40 flex items-center gap-1 mt-1 font-bold uppercase tracking-wider">
+                                                    Define tu propio reto y terreno
+                                                </p>
+                                            </div>
+                                            <div className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-white/10 text-white/60">
+                                                Configurable
+                                            </div>
+                                        </div>
+
+                                        {form.carrera_id === 'custom' && (
+                                            <div className="mt-6 pt-6 border-t border-white/10 space-y-4 animate-fade-in">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <InputField label="Distancia" field="objetivo_distancia" placeholder="100" unit="km" form={form} update={update} errors={errors} />
+                                                    <InputField label="Desnivel" field="objetivo_desnivel" placeholder="2000" unit="m" form={form} update={update} errors={errors} />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2 ml-1">Fecha límite</label>
+                                                        <input
+                                                            type="date"
+                                                            value={form.objetivo_fecha}
+                                                            onChange={(e) => update('objetivo_fecha', e.target.value)}
+                                                            className={`input-field !text-xs ${errors.objetivo_fecha ? '!border-titan-danger' : ''}`}
+                                                        />
+                                                        {errors.objetivo_fecha && <p className="text-[10px] text-titan-danger mt-1.5 font-bold ml-1">{errors.objetivo_fecha}</p>}
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2 ml-1">Terreno</label>
+                                                        <select
+                                                            value={form.objetivo_terreno}
+                                                            onChange={(e) => update('objetivo_terreno', e.target.value)}
+                                                            className="input-field !text-xs !bg-transparent appearance-none"
+                                                        >
+                                                            <option value="carretera">Carretera</option>
+                                                            <option value="mtb">MTB</option>
+                                                            <option value="gravel">Gravel</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {form.carrera_id === 'custom' && (
+                                        <div className="absolute -top-4 -right-4 w-24 h-24 bg-dunr-orange/10 rounded-full blur-2xl" />
+                                    )}
+                                </button>
                             </div>
                         </div>
                     )}
