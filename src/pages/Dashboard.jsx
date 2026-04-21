@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { DEMO_MODE, DEMO_SESSIONS } from '../lib/mockData'
 import { supabase } from '../lib/supabase'
 import CountdownTimer from '../components/CountdownTimer'
+import ProgressCharts from '../components/ProgressCharts'
 import {
     TrendingUp, Clock, Calendar, Flame, ChevronRight,
     CheckCircle, Zap, Target, RefreshCw
@@ -329,6 +330,11 @@ export default function Dashboard() {
                                 <p className="text-xl font-black text-white">{stats.completed}</p>
                                 <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Hechas</p>
                             </div>
+                        </div>
+
+                        {/* Progress charts */}
+                        <div className="mt-6">
+                            <ProgressCharts sessions={sessions} />
                         </div>
 
                         <div className="mt-8 mb-4 border-t border-white/5 opacity-50" />
