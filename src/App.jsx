@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import BottomNav from './components/BottomNav'
+import InstallBanner from './components/InstallBanner'
 
 // Pages
 import Landing from './pages/Landing'
@@ -58,6 +59,7 @@ export default function App() {
             } />
           </Routes>
           <BottomNav />
+          <InstallBanner />
         </div>
       </AuthProvider>
     </BrowserRouter>
