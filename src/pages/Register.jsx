@@ -44,14 +44,14 @@ export default function Register() {
     return (
         <div className="min-h-screen bg-dunr-black flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
             {/* Background decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-blue/5 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-orange/5 rounded-full blur-3xl -mr-32 -mt-32" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-dunr-orange/5 rounded-full blur-3xl -ml-32 -mb-32" />
 
             <div className="w-full max-w-sm relative z-10">
                 {/* Logo */}
                 <div className="text-center mb-8 sm:mb-10">
                     <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
-                        <Mountain size={28} className="text-dunr-blue" />
+                        <Mountain size={28} className="text-dunr-orange" />
                     </div>
                     <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter mb-2">
                         DUN<span className="text-dunr-orange">R</span>
@@ -123,7 +123,7 @@ export default function Register() {
                         </div>
                     </div>
 
-                    <button type="submit" disabled={loading} className="btn-primary w-full !text-xs !font-black !uppercase !tracking-widest !py-4 shadow-xl shadow-dunr-blue/20">
+                    <button type="submit" disabled={loading} className="btn-primary w-full !text-xs !font-black !uppercase !tracking-widest !py-4 shadow-xl shadow-dunr-orange/20">
                         {loading ? (
                             <span className="flex items-center justify-center gap-2">
                                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

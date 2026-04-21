@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 
 const TYPE_COLORS = {
-    rodaje: { bg: 'bg-blue-500/10', text: 'text-blue-400', dot: 'bg-blue-500' },
+    rodaje: { bg: 'bg-dunr-orange/10', text: 'text-dunr-orange-light', dot: 'bg-dunr-orange' },
     intervalos: { bg: 'bg-red-500/10', text: 'text-red-400', dot: 'bg-red-500' },
     fuerza: { bg: 'bg-amber-500/10', text: 'text-amber-400', dot: 'bg-amber-500' },
     'descanso activo': { bg: 'bg-emerald-500/10', text: 'text-emerald-400', dot: 'bg-emerald-500' },
@@ -227,7 +227,7 @@ export default function CalendarPage() {
                             <div className="relative">
                                 <button
                                     onClick={() => setShowExportMenu(!showExportMenu)}
-                                    className="p-2 rounded-xl bg-white/5 text-white/60 hover:text-dunr-blue transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center border border-white/10"
+                                    className="p-2 rounded-xl bg-white/5 text-white/60 hover:text-dunr-orange transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center border border-white/10"
                                     title="Exportar plan"
                                 >
                                     <FileDown size={18} />
@@ -253,8 +253,8 @@ export default function CalendarPage() {
                                                 onClick={exportToiCal}
                                                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-white/5 transition-colors"
                                             >
-                                                <div className="bg-dunr-blue/10 p-1.5 rounded-lg">
-                                                    <CalendarIcon size={16} className="text-dunr-blue" />
+                                                <div className="bg-dunr-orange/10 p-1.5 rounded-lg">
+                                                    <CalendarIcon size={16} className="text-dunr-orange" />
                                                 </div>
                                                 Calendario (iCal)
                                             </button>
@@ -267,14 +267,14 @@ export default function CalendarPage() {
                             <div className="flex bg-white/5 border border-white/10 rounded-xl p-0.5">
                                 <button
                                     onClick={() => setView('week')}
-                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${view === 'week' ? 'bg-white/10 text-dunr-blue shadow-sm' : 'text-white/40'
+                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${view === 'week' ? 'bg-white/10 text-dunr-orange shadow-sm' : 'text-white/40'
                                         }`}
                                 >
                                     Semana
                                 </button>
                                 <button
                                     onClick={() => setView('month')}
-                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${view === 'month' ? 'bg-white/10 text-dunr-blue shadow-sm' : 'text-white/40'
+                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${view === 'month' ? 'bg-white/10 text-dunr-orange shadow-sm' : 'text-white/40'
                                         }`}
                                 >
                                     Mes
@@ -321,11 +321,11 @@ export default function CalendarPage() {
 
             {/* Move Modal */}
             {movingSession && (
-                <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 bg-titan-blue/60 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-titan-blue">Mover sesión</h2>
-                            <button onClick={() => setMovingSession(null)} className="p-2 text-titan-blue/20 hover:text-titan-blue transition-colors">
+                            <h2 className="text-xl font-bold text-gray-900">Mover sesión</h2>
+                            <button onClick={() => setMovingSession(null)} className="p-2 text-gray-300 hover:text-gray-900 transition-colors">
                                 <X size={24} />
                             </button>
                         </div>
@@ -334,13 +334,13 @@ export default function CalendarPage() {
                             <div className={`p-4 rounded-2xl ${TYPE_COLORS[movingSession.tipo]?.bg} border border-black/5`}>
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className={`text-xs font-bold uppercase ${TYPE_COLORS[movingSession.tipo]?.text}`}>{movingSession.tipo}</span>
-                                    <span className="text-xs text-titan-blue/40">• Semana {movingSession.semana}</span>
+                                    <span className="text-xs text-gray-400">• Semana {movingSession.semana}</span>
                                 </div>
-                                <p className="text-sm font-medium text-titan-blue/70 line-clamp-1">{movingSession.descripcion}</p>
+                                <p className="text-sm font-medium text-gray-700 line-clamp-1">{movingSession.descripcion}</p>
                             </div>
                         </div>
 
-                        <p className="text-sm font-bold text-titan-blue/40 mb-3 uppercase tracking-wider">Selecciona nueva fecha:</p>
+                        <p className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Selecciona nueva fecha:</p>
                         <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                             {Array.from({ length: 7 }, (_, i) => {
                                 const d = new Date()
@@ -359,17 +359,17 @@ export default function CalendarPage() {
                                             }`}
                                     >
                                         <div className="flex flex-col items-start">
-                                            <span className="text-sm font-bold text-titan-blue uppercase">
+                                            <span className="text-sm font-bold text-gray-900 uppercase">
                                                 {DAY_NAMES[d.getDay() === 0 ? 6 : d.getDay() - 1]} {d.getDate()}
                                             </span>
-                                            <span className="text-xs text-titan-blue/40">
+                                            <span className="text-xs text-gray-400">
                                                 {MONTH_NAMES[d.getMonth()]}
                                             </span>
                                         </div>
                                         {actionLoading && !isCurrent ? (
                                             <div className="w-4 h-4 border-2 border-titan-orange/30 border-t-titan-orange rounded-full animate-spin" />
                                         ) : (
-                                            <ChevronRight size={18} className={isCurrent ? 'text-titan-blue/10' : 'text-titan-orange'} />
+                                            <ChevronRight size={18} className={isCurrent ? 'text-gray-200/50' : 'text-titan-orange'} />
                                         )}
                                     </button>
                                 )
@@ -390,7 +390,7 @@ function MonthView({ currentDate, sessionsByDate, today }) {
             {/* Day headers */}
             <div className="grid grid-cols-7 gap-1 mb-1">
                 {DAY_NAMES.map((d) => (
-                    <div key={d} className="text-center text-xs font-medium text-titan-blue/40 py-1">
+                    <div key={d} className="text-center text-xs font-medium text-gray-400 py-1">
                         {d}
                     </div>
                 ))}
@@ -412,7 +412,7 @@ function MonthView({ currentDate, sessionsByDate, today }) {
                                 } ${isToday ? 'ring-2 ring-titan-orange' : ''} ${daySessions.length > 0 ? 'hover:bg-titan-sand cursor-pointer' : 'cursor-default'
                                 }`}
                         >
-                            <span className={`text-xs font-medium ${isToday ? 'text-titan-orange font-bold' : 'text-titan-blue/70'
+                            <span className={`text-xs font-medium ${isToday ? 'text-titan-orange font-bold' : 'text-gray-700'
                                 }`}>
                                 {date.getDate()}
                             </span>
@@ -462,7 +462,7 @@ function WeekView({ currentDate, sessionsByDate, today, onStartMove }) {
                     <div key={dateStr} className={`animate-fade-in ${isToday ? '' : ''}`}>
                         {/* Day label */}
                         <div className="flex items-center gap-2 mb-1.5">
-                            <span className={`text-xs font-bold uppercase tracking-wider ${isToday ? 'text-titan-orange' : 'text-titan-blue/40'
+                            <span className={`text-xs font-bold uppercase tracking-wider ${isToday ? 'text-titan-orange' : 'text-gray-400'
                                 }`}>
                                 {dayName} {date.getDate()}
                             </span>
@@ -488,7 +488,7 @@ function WeekView({ currentDate, sessionsByDate, today, onStartMove }) {
                                                 <span className={`px-2 py-0.5 rounded-lg text-xs font-semibold ${colors.bg} ${colors.text} capitalize`}>
                                                     {session.tipo}
                                                 </span>
-                                                <span className="text-xs text-titan-blue/40">Zona {session.intensidad_zona}</span>
+                                                <span className="text-xs text-gray-400">Zona {session.intensidad_zona}</span>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <button
@@ -496,7 +496,7 @@ function WeekView({ currentDate, sessionsByDate, today, onStartMove }) {
                                                         e.preventDefault()
                                                         onStartMove(session)
                                                     }}
-                                                    className="p-1 rounded-lg bg-titan-blue/5 text-titan-blue/30 hover:bg-titan-orange/10 hover:text-titan-orange transition-all"
+                                                    className="p-1 rounded-lg bg-dunr-orange/5 text-gray-900/30 hover:bg-titan-orange/10 hover:text-titan-orange transition-all"
                                                     title="Mover de día"
                                                 >
                                                     <MoveHorizontal size={16} />
@@ -504,12 +504,12 @@ function WeekView({ currentDate, sessionsByDate, today, onStartMove }) {
                                                 {session.completada ? (
                                                     <CheckCircle size={20} className="text-titan-success" />
                                                 ) : (
-                                                    <Circle size={20} className="text-titan-blue/20" />
+                                                    <Circle size={20} className="text-gray-300" />
                                                 )}
                                             </div>
                                         </div>
-                                        <p className="text-sm text-titan-blue/70 mb-2 line-clamp-2">{session.descripcion}</p>
-                                        <div className="flex items-center gap-4 text-xs text-titan-blue/40">
+                                        <p className="text-sm text-gray-700 mb-2 line-clamp-2">{session.descripcion}</p>
+                                        <div className="flex items-center gap-4 text-xs text-gray-400">
                                             <span className="flex items-center gap-1">
                                                 <Clock size={12} /> {session.completada ? session.duracion_real : session.duracion_min} min
                                             </span>
@@ -522,7 +522,7 @@ function WeekView({ currentDate, sessionsByDate, today, onStartMove }) {
                             })
                         ) : (
                             <div className="glass-card p-4 text-center">
-                                <p className="text-sm text-titan-blue/30">Descanso</p>
+                                <p className="text-sm text-gray-900/30">Descanso</p>
                             </div>
                         )}
                     </div>

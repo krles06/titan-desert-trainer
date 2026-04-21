@@ -23,7 +23,7 @@ export default function BottomNav() {
                         to={to}
                         className={({ isActive }) =>
                             `flex flex-col items-center gap-0.5 py-2 px-4 rounded-xl transition-all duration-200 min-h-[44px] min-w-[44px] justify-center ${isActive
-                                ? 'text-dunr-blue'
+                                ? 'text-dunr-orange'
                                 : 'text-white/40 hover:text-white/60'
                             }`
                         }
@@ -35,7 +35,7 @@ export default function BottomNav() {
                                     {label}
                                 </span>
                                 {isActive && (
-                                    <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-dunr-blue rounded-full shadow-[0_0_8px_rgba(0,163,255,0.5)]" />
+                                    <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-dunr-orange rounded-full shadow-[0_0_8px_rgba(255,138,0,0.6)]" />
                                 )}
                             </>
                         )}

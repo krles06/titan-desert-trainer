@@ -32,12 +32,12 @@ export default function Landing() {
             {/* Hero */}
             <section className="gradient-desert relative overflow-hidden px-4 pt-12 pb-16 sm:pt-16 sm:pb-20">
                 {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-blue/10 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-orange/10 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-dunr-orange/5 rounded-full blur-2xl" />
 
                 <div className="relative max-w-lg mx-auto text-center">
                     <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 mb-6">
-                        <Mountain size={14} className="text-dunr-blue" />
+                        <Mountain size={14} className="text-dunr-orange" />
                         <span className="text-xs font-medium text-white/80">{RACES[0].name} 2026</span>
                     </div>
 
@@ -80,7 +80,7 @@ export default function Landing() {
 
             {/* Features */}
             <section className="px-4 py-12 sm:py-16 max-w-lg mx-auto w-full">
-                <h2 className="text-2xl font-bold text-titan-blue text-center mb-8">
+                <h2 className="text-2xl font-bold text-white text-center mb-8">
                     ¿Cómo te preparamos?
                 </h2>
                 <div className="grid gap-4">
@@ -93,8 +93,8 @@ export default function Landing() {
                                 <Icon size={22} className="text-titan-orange" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-titan-blue mb-0.5">{title}</h3>
-                                <p className="text-sm text-titan-blue/60">{desc}</p>
+                                <h3 className="font-semibold text-white mb-0.5">{title}</h3>
+                                <p className="text-sm text-white/60">{desc}</p>
                             </div>
                         </div>
                     ))}
@@ -117,7 +117,7 @@ export default function Landing() {
                 <div className="max-w-lg mx-auto">
                     <Link
                         to="/legal"
-                        className="inline-flex items-center gap-2 text-white/20 hover:text-dunr-blue transition-colors text-[10px] font-black uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 text-white/20 hover:text-dunr-orange transition-colors text-[10px] font-black uppercase tracking-widest"
                     >
                         <Info size={12} />
                         Información Legal

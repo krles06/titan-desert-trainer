@@ -3,10 +3,10 @@
 @theme {
   --color-dunr-orange: #FF8A00;
   --color-dunr-orange-light: #FFA63D;
-  --color-dunr-orange-dark: #CC6E00;
-  --color-dunr-blue: #00A3FF;
-  --color-dunr-blue-light: #33B5FF;
-  --color-dunr-blue-dark: #0082CC;
+  --color-dunr-orange-dark: #CC4400;
+  --color-dunr-blue: #FF8A00;
+  --color-dunr-blue-light: #FFA63D;
+  --color-dunr-blue-dark: #CC4400;
   --color-dunr-black: #000000;
   --color-dunr-dark: #0A0A0A;
   --color-dunr-gray: #1C1C1C;
@@ -123,38 +123,38 @@
   }
 
   .glass-card {
-    background: rgba(28, 28, 28, 0.6);
+    background: rgba(18, 10, 3, 0.75);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 138, 0, 0.12);
     border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   }
 
   .glass-card-dark {
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.88);
     backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 138, 0, 0.15);
     border-radius: 24px;
     color: white;
   }
 
   .skeleton {
-    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background: linear-gradient(90deg, #1c1c1c 25%, #2a2a2a 50%, #1c1c1c 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
     border-radius: 8px;
   }
 
   .gradient-desert {
-    background: linear-gradient(135deg, #000000 0%, #001F3F 50%, #FF8A00 100%);
+    background: linear-gradient(135deg, #000000 0%, #1A0800 55%, #CC4400 85%, #FF8A00 100%);
   }
 
   .gradient-dunr {
-    background: linear-gradient(135deg, var(--color-dunr-blue) 0%, var(--color-dunr-orange) 100%);
+    background: linear-gradient(135deg, #CC4400 0%, #FF8A00 100%);
   }
 
   .gradient-dark {
-    background: radial-gradient(circle at top right, var(--color-dunr-gray), var(--color-dunr-black));
+    background: radial-gradient(circle at top right, #160800, var(--color-dunr-black));
   }
 
   .btn-primary {
@@ -167,18 +167,18 @@
     font-size: 16px;
     font-weight: 700;
     color: white;
-    background: linear-gradient(135deg, #00A3FF, #FF8A00);
+    background: linear-gradient(135deg, #CC4400, #FF8A00);
     border: none;
     border-radius: 14px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
-    box-shadow: 0 4px 15px rgba(0, 163, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 138, 0, 0.35);
   }
 
   .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(224, 92, 0, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 138, 0, 0.5);
   }
 
   .btn-primary:active {
@@ -211,8 +211,8 @@
   }
 
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--color-dunr-blue);
+    background: rgba(255, 138, 0, 0.08);
+    border-color: var(--color-dunr-orange);
   }
 
   .input-field {
@@ -221,8 +221,8 @@
     min-height: 44px;
     font-size: 14px;
     color: white;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     outline: none;
     transition: all 0.2s ease;
@@ -236,9 +236,9 @@
   }
 
   .input-field:focus {
-    border-color: var(--color-dunr-blue);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 4px rgba(0, 163, 255, 0.1);
+    border-color: var(--color-dunr-orange);
+    background: rgba(255, 138, 0, 0.05);
+    box-shadow: 0 0 0 4px rgba(255, 138, 0, 0.12);
   }
 
   .input-field::placeholder {
