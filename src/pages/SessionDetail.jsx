@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 
 const TYPE_COLORS = {
-    rodaje: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
+    rodaje: { bg: 'bg-dunr-orange/10', text: 'text-dunr-orange-light' },
     intervalos: { bg: 'bg-red-500/10', text: 'text-red-400' },
     fuerza: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
     'descanso activo': { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
@@ -27,7 +27,7 @@ const ZONE_DESCRIPTIONS = {
 
 const DIFFICULTY_OPTIONS = [
     { value: 'muy_facil', label: 'Muy fácil', icon: ThumbsUp, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
-    { value: 'normal', label: 'Normal', icon: Minus, color: 'text-dunr-blue bg-dunr-blue/10 border-dunr-blue/20' },
+    { value: 'normal', label: 'Normal', icon: Minus, color: 'text-dunr-orange bg-dunr-orange/10 border-dunr-orange/20' },
     { value: 'muy_dificil', label: 'Muy difícil', icon: ThumbsDown, color: 'text-red-400 bg-red-500/10 border-red-500/20' },
 ]
 
@@ -266,7 +266,7 @@ export default function SessionDetail() {
                 <div className="glass-card p-5 animate-fade-in">
                     <div className="grid grid-cols-3 gap-4">
                         <div className="text-center">
-                            <Clock size={20} className="text-dunr-blue mx-auto mb-1" />
+                            <Clock size={20} className="text-dunr-orange mx-auto mb-1" />
                             <p className="text-xl font-black text-white">
                                 {session.completada ? session.tiempo_real_min : session.duracion_min}
                                 <span className="text-xs font-normal opacity-40 ml-0.5"> min</span>
@@ -299,7 +299,7 @@ export default function SessionDetail() {
                     <div className="flex items-center gap-3 mb-3">
                         <div className="flex-1 bg-white/5 rounded-full h-2 overflow-hidden border border-white/5">
                             <div
-                                className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-dunr-blue to-dunr-orange"
+                                className="h-full rounded-full bg-gradient-to-r from-dunr-orange-dark via-dunr-orange to-dunr-orange-light"
                                 style={{ width: `${(session.intensidad_zona / 5) * 100}%` }}
                             />
                         </div>
@@ -508,7 +508,7 @@ export default function SessionDetail() {
                             disabled={saving}
                             className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl ${session.completada
                                 ? 'bg-white/5 text-white/40 hover:bg-white/10 border border-white/10'
-                                : 'btn-primary shadow-dunr-blue/20'
+                                : 'btn-primary shadow-dunr-orange/20'
                                 }`}
                         >
                             {saving && !session.completada ? (

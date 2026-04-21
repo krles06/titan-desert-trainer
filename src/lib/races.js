@@ -18,7 +18,7 @@ export const RACES = [
         distance_total: 350,
         stages: 5,
         difficulty: 'Alta',
-        color: 'titan-blue',
+        color: 'dunr-orange',
         image_prompt: 'mountain biker in tabernas desert almeria spain titan desert'
     }
 ]

@@ -176,7 +176,7 @@ export default function Onboarding() {
             <div className="gradient-desert px-4 pt-8 pb-12">
                 <div className="max-w-lg mx-auto text-center">
                     <div className="inline-flex items-center gap-2 mb-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-3 py-1">
-                        <Mountain size={14} className="text-dunr-blue" />
+                        <Mountain size={14} className="text-dunr-orange" />
                         <span className="text-white/60 text-[10px] font-bold uppercase tracking-widest">DUNR TRAINER</span>
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-black text-white mb-8 tracking-tighter">PREPARA TU RETO</h1>
@@ -185,10 +185,10 @@ export default function Onboarding() {
                     <div className="flex items-center justify-center gap-4 sm:gap-6 mb-6">
                         {STEPS.map((s, i) => (
                             <div key={i} className="flex flex-col items-center gap-2">
-                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all duration-500 border-2 ${i <= step ? 'bg-gradient-to-br from-dunr-blue to-dunr-orange border-none text-white shadow-xl shadow-dunr-blue/20' : 'bg-white/5 border-white/10 text-white/20'}`}>
+                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all duration-500 border-2 ${i <= step ? 'bg-gradient-to-br from-dunr-orange to-dunr-orange border-none text-white shadow-xl shadow-dunr-orange/20' : 'bg-white/5 border-white/10 text-white/20'}`}>
                                     <s.icon size={18} className="sm:w-[20px]" />
                                 </div>
-                                <div className={`h-1.5 w-6 sm:w-8 rounded-full ${i <= step ? 'bg-dunr-blue' : 'bg-white/10'}`} />
+                                <div className={`h-1.5 w-6 sm:w-8 rounded-full ${i <= step ? 'bg-dunr-orange' : 'bg-white/10'}`} />
                             </div>
                         ))}
                     </div>
@@ -221,14 +221,14 @@ export default function Onboarding() {
                                         type="button"
                                         onClick={() => update('carrera_id', race.id)}
                                         className={`w-full text-left p-5 rounded-2xl border-2 transition-all relative overflow-hidden group ${form.carrera_id === race.id
-                                            ? 'border-dunr-blue bg-dunr-blue/5 shadow-2xl shadow-dunr-blue/10'
+                                            ? 'border-dunr-orange bg-dunr-orange/5 shadow-2xl shadow-dunr-orange/10'
                                             : 'border-white/5 bg-white/5 hover:border-white/20'
                                             }`}
                                     >
                                         <div className="relative z-10">
                                             <div className="flex justify-between items-start mb-2">
                                                 <div>
-                                                    <h3 className={`font-black text-lg tracking-tight transition-colors ${form.carrera_id === race.id ? 'text-dunr-blue' : 'text-white'}`}>
+                                                    <h3 className={`font-black text-lg tracking-tight transition-colors ${form.carrera_id === race.id ? 'text-dunr-orange' : 'text-white'}`}>
                                                         {race.name}
                                                     </h3>
                                                     <p className="text-[10px] text-white/40 flex items-center gap-1 mt-1 font-bold uppercase tracking-wider">
@@ -258,7 +258,7 @@ export default function Onboarding() {
                                             </div>
                                         </div>
                                         {form.carrera_id === race.id && (
-                                            <div className="absolute -top-4 -right-4 w-24 h-24 bg-dunr-blue/10 rounded-full blur-2xl" />
+                                            <div className="absolute -top-4 -right-4 w-24 h-24 bg-dunr-orange/10 rounded-full blur-2xl" />
                                         )}
                                     </button>
                                 ))}
@@ -352,11 +352,11 @@ export default function Onboarding() {
                                             type="button"
                                             onClick={() => update('nivel_experiencia', nivel.value)}
                                             className={`text-left p-4 rounded-xl border-2 transition-all ${form.nivel_experiencia === nivel.value
-                                                ? 'border-dunr-blue bg-dunr-blue/5'
+                                                ? 'border-dunr-orange bg-dunr-orange/5'
                                                 : 'border-white/5 bg-white/5 hover:border-white/20'
                                                 }`}
                                         >
-                                            <span className={`font-black uppercase tracking-tight text-sm ${form.nivel_experiencia === nivel.value ? 'text-dunr-blue' : 'text-white'}`}>{nivel.label}</span>
+                                            <span className={`font-black uppercase tracking-tight text-sm ${form.nivel_experiencia === nivel.value ? 'text-dunr-orange' : 'text-white'}`}>{nivel.label}</span>
                                             <p className="text-[11px] text-white/40 mt-1 font-medium leading-relaxed">{nivel.desc}</p>
                                         </button>
                                     ))}
@@ -373,7 +373,7 @@ export default function Onboarding() {
                         <div className="space-y-6">
                             <div>
                                 <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4 ml-1">
-                                    Días de entreno: <strong className="text-dunr-blue text-sm ml-1 tracking-normal">{form.dias_entreno_semana}</strong> días/semana
+                                    Días de entreno: <strong className="text-dunr-orange text-sm ml-1 tracking-normal">{form.dias_entreno_semana}</strong> días/semana
                                 </label>
                                 <input
                                     type="range"
@@ -381,7 +381,7 @@ export default function Onboarding() {
                                     max="6"
                                     value={form.dias_entreno_semana}
                                     onChange={(e) => update('dias_entreno_semana', Number(e.target.value))}
-                                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-dunr-blue"
+                                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-dunr-orange"
                                 />
                                 <div className="flex justify-between text-[10px] text-white/20 font-bold uppercase tracking-wider mt-2 px-1">
                                     <span>2 días</span>
@@ -391,7 +391,7 @@ export default function Onboarding() {
 
                             <div>
                                 <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4 ml-1">
-                                    Disponibilidad diaria: <strong className="text-dunr-blue text-sm ml-1 tracking-normal">{form.minutos_dia}</strong> minutos
+                                    Disponibilidad diaria: <strong className="text-dunr-orange text-sm ml-1 tracking-normal">{form.minutos_dia}</strong> minutos
                                 </label>
                                 <input
                                     type="range"
@@ -400,7 +400,7 @@ export default function Onboarding() {
                                     step="15"
                                     value={form.minutos_dia}
                                     onChange={(e) => update('minutos_dia', Number(e.target.value))}
-                                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-dunr-blue"
+                                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-dunr-orange"
                                 />
                                 <div className="flex justify-between text-[10px] text-white/20 font-bold uppercase tracking-wider mt-2 px-1">
                                     <span>30 min</span>
@@ -422,7 +422,7 @@ export default function Onboarding() {
                                             type="button"
                                             onClick={() => update('participado_antes', option.value)}
                                             className={`flex-1 p-4 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all ${form.participado_antes === option.value
-                                                ? 'border-dunr-blue bg-dunr-blue text-white shadow-lg shadow-dunr-blue/20'
+                                                ? 'border-dunr-orange bg-dunr-orange text-white shadow-lg shadow-dunr-orange/20'
                                                 : 'border-white/5 bg-white/5 text-white/30 hover:border-white/20'
                                                 }`}
                                         >
@@ -470,7 +470,7 @@ export default function Onboarding() {
                                                     }
                                                 }}
                                                 className={`py-3.5 px-2 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all ${isSelected
-                                                    ? 'border-dunr-blue bg-dunr-blue text-white shadow-xl shadow-dunr-blue/20'
+                                                    ? 'border-dunr-orange bg-dunr-orange text-white shadow-xl shadow-dunr-orange/20'
                                                     : 'border-white/5 bg-white/5 text-white/30 hover:border-white/20'
                                                     }`}
                                             >

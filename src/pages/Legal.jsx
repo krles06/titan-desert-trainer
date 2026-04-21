@@ -20,7 +20,7 @@ export default function Legal() {
                     <p>
                         Recomendamos encarecidamente someterse a un chequeo médico antes de iniciar cualquier programa de entrenamiento intenso.
                     </p>
-                    <div className="flex items-center gap-2 pt-2 text-dunr-blue">
+                    <div className="flex items-center gap-2 pt-2 text-dunr-orange">
                         <Mail size={14} />
                         <span className="font-bold">soporte@dunr.app</span>
                     </div>
@@ -93,7 +93,7 @@ export default function Legal() {
                 {sections.map((section) => (
                     <section key={section.id} id={section.id} className="glass-card p-6 animate-fade-in border-white/5">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-xl bg-dunr-blue/10 flex items-center justify-center text-dunr-blue">
+                            <div className="w-10 h-10 rounded-xl bg-dunr-orange/10 flex items-center justify-center text-dunr-orange">
                                 <section.icon size={20} />
                             </div>
                             <h2 className="text-lg font-black text-white uppercase tracking-tight">{section.title}</h2>

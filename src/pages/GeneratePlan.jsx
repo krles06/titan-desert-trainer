@@ -106,14 +106,14 @@ export default function GeneratePlan() {
 
     return (
         <div className="min-h-screen bg-dunr-black flex items-center justify-center px-4 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-dunr-blue/5 rounded-full blur-3xl -mr-48 -mt-48" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-dunr-orange/5 rounded-full blur-3xl -mr-48 -mt-48" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-dunr-orange/5 rounded-full blur-3xl -ml-48 -mb-48" />
 
             <div className="max-w-sm w-full text-center relative z-10">
                 {/* Animated icon */}
                 <div className="relative mb-12">
-                    <div className="w-28 h-28 mx-auto rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-center animate-pulse-glow shadow-2xl shadow-dunr-blue/10">
-                        <Icon size={44} className="text-dunr-blue" />
+                    <div className="w-28 h-28 mx-auto rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-center animate-pulse-glow shadow-2xl shadow-dunr-orange/10">
+                        <Icon size={44} className="text-dunr-orange" />
                     </div>
                     {/* Rotating ring */}
                     <div className="absolute -inset-4 mx-auto w-36 h-36">
@@ -127,7 +127,7 @@ export default function GeneratePlan() {
                             />
                             <defs>
                                 <linearGradient id="gradient-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="var(--color-dunr-blue)" stopOpacity="0.4" />
+                                    <stop offset="0%" stopColor="var(--color-dunr-orange)" stopOpacity="0.4" />
                                     <stop offset="100%" stopColor="var(--color-dunr-orange)" stopOpacity="0.4" />
                                 </linearGradient>
                             </defs>
@@ -147,7 +147,7 @@ export default function GeneratePlan() {
                 <div className="px-8">
                     <div className="w-full bg-white/5 border border-white/5 rounded-full h-1.5 overflow-hidden mb-3">
                         <div
-                            className="h-full bg-gradient-to-r from-dunr-blue to-dunr-orange rounded-full transition-all duration-700 ease-out"
+                            className="h-full bg-gradient-to-r from-dunr-orange to-dunr-orange rounded-full transition-all duration-700 ease-out"
                             style={{ width: `${progress}%` }}
                         />
                     </div>

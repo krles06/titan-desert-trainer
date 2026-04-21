@@ -32,7 +32,7 @@ export default function ForgotPassword() {
     return (
         <div className="min-h-screen bg-dunr-black flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden">
             {/* Background decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-blue/5 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-dunr-orange/5 rounded-full blur-3xl -mr-32 -mt-32" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-dunr-orange/5 rounded-full blur-3xl -ml-32 -mb-32" />
 
             <div className="w-full max-w-sm relative z-10">
@@ -84,7 +84,7 @@ export default function ForgotPassword() {
                                 </div>
                             </div>
 
-                            <button type="submit" disabled={loading} className="btn-primary w-full !py-4 !text-xs !font-black !uppercase !tracking-widest shadow-xl shadow-dunr-blue/20">
+                            <button type="submit" disabled={loading} className="btn-primary w-full !py-4 !text-xs !font-black !uppercase !tracking-widest shadow-xl shadow-dunr-orange/20">
                                 {loading ? 'Enviando...' : 'Enviar enlace'}
                             </button>
 

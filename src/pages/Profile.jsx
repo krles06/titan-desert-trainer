@@ -43,7 +43,7 @@ export default function Profile() {
     return (
         <div className="min-h-screen bg-dunr-black pb-32 relative overflow-hidden">
             {/* Background elements */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-dunr-blue/5 rounded-full blur-3xl -mr-40 -mt-40" />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-dunr-orange/5 rounded-full blur-3xl -mr-40 -mt-40" />
             <div className="absolute top-1/2 left-0 w-64 h-64 bg-dunr-orange/5 rounded-full blur-3xl -ml-32" />
 
             {/* Header */}
@@ -63,7 +63,7 @@ export default function Profile() {
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-4">
                             <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
-                                <User size={32} className="text-dunr-blue" />
+                                <User size={32} className="text-dunr-orange" />
                             </div>
                             <div>
                                 <h2 className="text-xl font-black text-white uppercase tracking-tight">{profile?.nombre || 'Ciclista'}</h2>
@@ -160,7 +160,7 @@ export default function Profile() {
                                     />
                                 </div>
                             </div>
-                            <button onClick={handleSave} disabled={saving} className="btn-primary w-full !py-4 !text-xs !font-black !uppercase !tracking-widest shadow-xl shadow-dunr-blue/20">
+                            <button onClick={handleSave} disabled={saving} className="btn-primary w-full !py-4 !text-xs !font-black !uppercase !tracking-widest shadow-xl shadow-dunr-orange/20">
                                 {saving ? 'Guardando...' : <><Save size={16} /> Guardar cambios</>}
                             </button>
                         </div>
@@ -184,7 +184,7 @@ export default function Profile() {
                         onClick={() => navigate('/subscription')}
                         className="w-full flex items-center gap-4 px-6 py-5 hover:bg-white/5 transition-colors group"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-dunr-blue/10 flex items-center justify-center text-dunr-blue transition-colors group-hover:bg-dunr-blue group-hover:text-white">
+                        <div className="w-10 h-10 rounded-xl bg-dunr-orange/10 flex items-center justify-center text-dunr-orange transition-colors group-hover:bg-dunr-orange group-hover:text-white">
                             <Shield size={20} />
                         </div>
                         <span className="text-xs font-black uppercase tracking-widest text-white flex-1 text-left">Mi Suscripción</span>
@@ -201,13 +201,13 @@ export default function Profile() {
                         <div className="space-y-3">
                             <button
                                 onClick={() => navigate('/generate-plan?reason=manual_refresh')}
-                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-dunr-blue/5 border border-dunr-blue/10 hover:bg-dunr-blue/10 transition-all group"
+                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-dunr-orange/5 border border-dunr-orange/10 hover:bg-dunr-orange/10 transition-all group"
                             >
                                 <div className="text-left">
                                     <p className="text-xs font-black text-white uppercase tracking-wider mb-1">Mantener mis datos</p>
                                     <p className="text-[10px] text-white/40 font-medium">Regenera sesiones con tu perfil actual</p>
                                 </div>
-                                <RefreshCw size={16} className="text-dunr-blue group-hover:rotate-180 transition-transform duration-500" />
+                                <RefreshCw size={16} className="text-dunr-orange group-hover:rotate-180 transition-transform duration-500" />
                             </button>
                             <button
                                 onClick={() => navigate('/onboarding')}

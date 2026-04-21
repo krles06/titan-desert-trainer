@@ -73,7 +73,7 @@ export default function Subscription() {
     return (
         <div className="min-h-screen bg-dunr-black pb-32 relative overflow-hidden">
             {/* Background decorative elements */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-dunr-blue/5 rounded-full blur-3xl -mr-48 -mt-48" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-dunr-orange/5 rounded-full blur-3xl -mr-48 -mt-48" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-dunr-orange/5 rounded-full blur-3xl -ml-48 -mb-48" />
 
             {/* Header */}
@@ -155,7 +155,7 @@ export default function Subscription() {
                         <button
                             onClick={handleSubscribe}
                             disabled={loading}
-                            className="btn-primary w-full py-5 text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-dunr-blue/40 disabled:opacity-50"
+                            className="btn-primary w-full py-5 text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-dunr-orange/40 disabled:opacity-50"
                         >
                             {loading ? 'CONECTANDO...' : 'SUSCRIBIRSE AHORA'}
                         </button>

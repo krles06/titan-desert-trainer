@@ -162,8 +162,8 @@ export default function Dashboard() {
             {/* Phase 1 Warning */}
             {new URLSearchParams(window.location.search).get('phase1') === 'true' && (
                 <div className="px-4 mt-4 animate-fade-in">
-                    <div className="glass-card border-dunr-blue/30 bg-dunr-blue/5 p-4 flex gap-3 items-center">
-                        <div className="w-10 h-10 rounded-xl bg-dunr-blue/20 flex items-center justify-center text-dunr-blue shrink-0">
+                    <div className="glass-card border-dunr-orange/30 bg-dunr-orange/5 p-4 flex gap-3 items-center">
+                        <div className="w-10 h-10 rounded-xl bg-dunr-orange/20 flex items-center justify-center text-dunr-orange shrink-0">
                             <Zap size={20} />
                         </div>
                         <div>
@@ -186,21 +186,21 @@ export default function Dashboard() {
                                     ? 'border-titan-danger bg-titan-danger/5'
                                     : warning.tipo === 'alerta_importante'
                                         ? 'border-dunr-orange bg-dunr-orange/5'
-                                        : 'border-dunr-blue bg-dunr-blue/5'
+                                        : 'border-dunr-orange bg-dunr-orange/5'
                                     }`}
                             >
                                 <div className={`p-2 rounded-xl h-fit ${warning.tipo === 'alerta_critica'
                                     ? 'bg-titan-danger/20 text-titan-danger'
                                     : warning.tipo === 'alerta_importante'
                                         ? 'bg-dunr-orange/20 text-dunr-orange'
-                                        : 'bg-dunr-blue/20 text-dunr-blue'
+                                        : 'bg-dunr-orange/20 text-dunr-orange'
                                     }`}>
                                     <TrendingUp size={20} />
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Notificación DUNR</h3>
-                                        <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${warning.tipo === 'alerta_critica' ? 'bg-titan-danger' : warning.tipo === 'alerta_importante' ? 'bg-dunr-orange' : 'bg-dunr-blue'}`} />
+                                        <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${warning.tipo === 'alerta_critica' ? 'bg-titan-danger' : warning.tipo === 'alerta_importante' ? 'bg-dunr-orange' : 'bg-dunr-orange'}`} />
                                     </div>
                                     <p className="text-sm font-bold text-white leading-tight">{warning.mensaje}</p>
                                 </div>
@@ -233,12 +233,12 @@ export default function Dashboard() {
                         {stats.nextSession ? (
                             <div className="mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
                                 <div className="flex items-center gap-2 mb-3 px-1">
-                                    <Zap size={16} className="text-dunr-blue" />
+                                    <Zap size={16} className="text-dunr-orange" />
                                     <span className="text-xs font-bold text-white/90 uppercase tracking-wider">Próxima sesión</span>
                                 </div>
                                 <Link
                                     to={`/session/${stats.nextSession.id}`}
-                                    className="block glass-card p-6 hover:scale-[1.01] transition-transform shadow-xl shadow-dunr-blue/5 border-l-4 border-l-dunr-blue"
+                                    className="block glass-card p-6 hover:scale-[1.01] transition-transform shadow-xl shadow-dunr-orange/5 border-l-4 border-l-dunr-orange"
                                 >
                                     <div className="flex items-start justify-between mb-4">
                                         <div>
@@ -246,7 +246,7 @@ export default function Dashboard() {
                                                 {stats.nextSession.tipo}
                                             </h3>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[10px] bg-dunr-blue text-white px-2 py-0.5 rounded-full font-bold uppercase">
+                                                <span className="text-[10px] bg-dunr-orange text-white px-2 py-0.5 rounded-full font-bold uppercase">
                                                     Semana {stats.nextSession.semana}
                                                 </span>
                                                 <span className="text-xs text-white/40">{stats.nextSession.dia_semana}</span>
@@ -298,7 +298,7 @@ export default function Dashboard() {
                             </div>
                             <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden">
                                 <div
-                                    className="h-full bg-gradient-to-r from-dunr-blue to-dunr-orange rounded-full transition-all duration-1000 ease-out"
+                                    className="h-full bg-gradient-to-r from-dunr-orange to-dunr-orange rounded-full transition-all duration-1000 ease-out"
                                     style={{ width: `${stats.percentComplete}%` }}
                                 />
                             </div>
@@ -310,7 +310,7 @@ export default function Dashboard() {
                         {/* Stat cards */}
                         <div className="grid grid-cols-2 gap-3">
                             <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                                <Calendar size={18} className="text-dunr-blue mb-2" />
+                                <Calendar size={18} className="text-dunr-orange mb-2" />
                                 <p className="text-2xl font-black text-white">{stats.weeksCompleted}<span className="text-xs font-normal text-white/30 ml-1">/{stats.weeks}</span></p>
                                 <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Semanas</p>
                             </div>
@@ -320,7 +320,7 @@ export default function Dashboard() {
                                 <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Días racha</p>
                             </div>
                             <div className="glass-card p-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                                <Clock size={12} className="text-dunr-blue mb-2" />
+                                <Clock size={12} className="text-dunr-orange mb-2" />
                                 <p className="text-xl font-black text-white">{Math.round(stats.hoursTotal)}<span className="text-xs font-normal text-white/30 ml-1">h</span></p>
                                 <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Entrenado</p>
                             </div>
