@@ -5,6 +5,7 @@ import { DEMO_MODE, DEMO_SESSIONS } from '../lib/mockData'
 import { supabase } from '../lib/supabase'
 import CountdownTimer from '../components/CountdownTimer'
 import ProgressCharts from '../components/ProgressCharts'
+import WeeklySummary from '../components/WeeklySummary'
 import {
     TrendingUp, Clock, Calendar, Flame, ChevronRight,
     CheckCircle, Zap, Target, RefreshCw
@@ -332,8 +333,13 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Progress charts */}
+                        {/* Weekly summary */}
                         <div className="mt-6">
+                            <WeeklySummary sessions={sessions} />
+                        </div>
+
+                        {/* Progress charts */}
+                        <div className="mt-4">
                             <ProgressCharts sessions={sessions} />
                         </div>
 
