@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { DEMO_MODE, DEMO_SESSIONS } from '../lib/mockData'
-import { Send, Bot, ChevronLeft } from 'lucide-react'
+import { Send, Bot, ChevronLeft, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const QUICK_QUESTIONS = [
@@ -32,35 +32,59 @@ function TypingDots() {
 }
 
 export default function CoachChat() {
-    const { profile } = useAuth()
-    const [messages, setMessages] = useState([
-        { role: 'assistant', content: WELCOME }
-    ])
+    const { profile, user } = useAuth()
+    const [messages, setMessages] = useState([])
     const [input, setInput] = useState('')
     const [loading, setLoading] = useState(false)
+    const [loadingHistory, setLoadingHistory] = useState(true)
     const [sessions, setSessions] = useState([])
     const [stats, setStats] = useState(null)
     const bottomRef = useRef(null)
     const inputRef = useRef(null)
 
+    // Load training data and chat history on mount
     useEffect(() => {
-        async function loadData() {
+        async function loadAll() {
             if (DEMO_MODE) {
                 const saved = localStorage.getItem('demo_sessions')
                 const s = saved ? JSON.parse(saved) : DEMO_SESSIONS
                 setSessions(s)
                 buildStats(s)
-            } else {
-                const { data } = await supabase
-                    .from('sessions')
-                    .select('*')
-                    .order('fecha', { ascending: false })
-                    .limit(50)
-                if (data) { setSessions(data); buildStats(data) }
+                setMessages([{ role: 'assistant', content: WELCOME, id: 'welcome' }])
+                setLoadingHistory(false)
+                return
             }
+
+            const [sessionsRes, historyRes] = await Promise.all([
+                supabase.from('sessions').select('*').order('fecha', { ascending: false }).limit(50),
+                supabase.from('chat_messages').select('*').order('created_at', { ascending: true }).limit(100)
+            ])
+
+            if (sessionsRes.data) {
+                setSessions(sessionsRes.data)
+                buildStats(sessionsRes.data)
+            }
+
+            if (historyRes.data && historyRes.data.length > 0) {
+                setMessages(historyRes.data.map(m => ({
+                    id: m.id,
+                    role: m.role,
+                    content: m.content,
+                    created_at: m.created_at,
+                })))
+            } else {
+                setMessages([{ role: 'assistant', content: WELCOME, id: 'welcome' }])
+                // Save welcome message
+                await supabase.from('chat_messages').insert({
+                    user_id: user.id,
+                    role: 'assistant',
+                    content: WELCOME,
+                })
+            }
+            setLoadingHistory(false)
         }
-        loadData()
-    }, [])
+        loadAll()
+    }, [user])
 
     function buildStats(s) {
         const total = s.length
@@ -82,8 +106,10 @@ export default function CoachChat() {
     }
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages, loading])
+        if (!loadingHistory) {
+            bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }
+    }, [messages, loading, loadingHistory])
 
     const recentSessions = useMemo(() =>
         sessions.filter(s => s.completada).slice(0, 5),
@@ -95,31 +121,55 @@ export default function CoachChat() {
         if (!msg || loading) return
 
         setInput('')
-        setMessages(prev => [...prev, { role: 'user', content: msg }])
+        const userMsg = { role: 'user', content: msg, id: Date.now().toString() }
+        setMessages(prev => [...prev, userMsg])
         setLoading(true)
 
         try {
             const history = messages
                 .filter(m => m.role !== 'system')
+                .slice(-10)
                 .map(m => ({ role: m.role, content: m.content }))
 
             if (DEMO_MODE) {
                 await new Promise(r => setTimeout(r, 1200))
                 setMessages(prev => [...prev, {
                     role: 'assistant',
-                    content: 'En modo demo el coach no está disponible. Conecta tu cuenta Supabase para activarlo.'
+                    content: 'En modo demo el coach no está disponible.',
+                    id: Date.now().toString()
                 }])
-            } else {
-                const { data, error } = await supabase.functions.invoke('coach-chat', {
-                    body: { message: msg, profile, recentSessions, stats, history }
-                })
-                if (error || data?.error) throw new Error(error?.message || data?.error)
-                setMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
+                return
             }
+
+            // Save user message to DB
+            await supabase.from('chat_messages').insert({
+                user_id: user.id,
+                role: 'user',
+                content: msg,
+            })
+
+            const { data, error } = await supabase.functions.invoke('coach-chat', {
+                body: { message: msg, profile, recentSessions, stats, history }
+            })
+            if (error || data?.error) throw new Error(error?.message || data?.error)
+
+            // Save assistant reply to DB
+            await supabase.from('chat_messages').insert({
+                user_id: user.id,
+                role: 'assistant',
+                content: data.reply,
+            })
+
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: data.reply,
+                id: Date.now().toString()
+            }])
         } catch (err) {
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: 'Ha habido un error. Inténtalo de nuevo en un momento.'
+                content: 'Ha habido un error. Inténtalo de nuevo en un momento.',
+                id: Date.now().toString()
             }])
         } finally {
             setLoading(false)
@@ -127,9 +177,24 @@ export default function CoachChat() {
         }
     }
 
+    async function clearHistory() {
+        if (!confirm('¿Borrar todo el historial del chat?')) return
+        if (!DEMO_MODE) {
+            await supabase.from('chat_messages').delete().eq('user_id', user.id)
+        }
+        setMessages([{ role: 'assistant', content: WELCOME, id: 'welcome' }])
+        if (!DEMO_MODE) {
+            await supabase.from('chat_messages').insert({
+                user_id: user.id, role: 'assistant', content: WELCOME,
+            })
+        }
+    }
+
     function handleKey(e) {
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
     }
+
+    const showQuickQuestions = messages.length <= 1
 
     return (
         <div className="flex flex-col h-dvh bg-dunr-black">
@@ -145,49 +210,76 @@ export default function CoachChat() {
                     <p className="text-sm font-black text-white leading-none">DUNR Coach</p>
                     <p className="text-[10px] text-white/40 mt-0.5">Entrenador personal IA</p>
                 </div>
-                <div className="ml-auto flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-titan-success animate-pulse" />
-                    <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">Activo</span>
+                <div className="ml-auto flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-titan-success animate-pulse" />
+                        <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">Activo</span>
+                    </div>
+                    {messages.length > 1 && (
+                        <button
+                            onClick={clearHistory}
+                            className="p-1.5 rounded-lg text-white/20 hover:text-white/60 transition-colors"
+                        >
+                            <Trash2 size={15} />
+                        </button>
+                    )}
                 </div>
             </div>
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-                {messages.map((m, i) => (
-                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                        {m.role === 'assistant' && (
-                            <div className="w-7 h-7 rounded-xl bg-dunr-orange/20 flex items-center justify-center shrink-0 mr-2 mt-1">
-                                <Bot size={14} className="text-dunr-orange" />
+                {loadingHistory ? (
+                    <div className="space-y-4 animate-pulse">
+                        <div className="flex gap-2">
+                            <div className="w-7 h-7 rounded-xl bg-white/5 shrink-0" />
+                            <div className="h-16 bg-white/5 rounded-2xl flex-1" />
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        {messages.map((m, i) => (
+                            <div key={m.id || i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+                                {m.role === 'assistant' && (
+                                    <div className="w-7 h-7 rounded-xl bg-dunr-orange/20 flex items-center justify-center shrink-0 mr-2 mt-1">
+                                        <Bot size={14} className="text-dunr-orange" />
+                                    </div>
+                                )}
+                                <div className="flex flex-col gap-1" style={{ maxWidth: '82%' }}>
+                                    <div
+                                        className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+                                            m.role === 'user'
+                                                ? 'bg-dunr-orange text-black font-medium rounded-br-sm'
+                                                : 'bg-white/5 text-white/90 border border-white/5 rounded-bl-sm'
+                                        }`}
+                                    >
+                                        {m.content}
+                                    </div>
+                                    {m.created_at && (
+                                        <span className={`text-[10px] text-white/20 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
+                                            {new Date(m.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+
+                        {loading && (
+                            <div className="flex justify-start animate-fade-in">
+                                <div className="w-7 h-7 rounded-xl bg-dunr-orange/20 flex items-center justify-center shrink-0 mr-2 mt-1">
+                                    <Bot size={14} className="text-dunr-orange" />
+                                </div>
+                                <div className="bg-white/5 border border-white/5 rounded-2xl rounded-bl-sm">
+                                    <TypingDots />
+                                </div>
                             </div>
                         )}
-                        <div
-                            className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                                m.role === 'user'
-                                    ? 'bg-dunr-orange text-black font-medium rounded-br-sm'
-                                    : 'bg-white/5 text-white/90 border border-white/5 rounded-bl-sm'
-                            }`}
-                        >
-                            {m.content}
-                        </div>
-                    </div>
-                ))}
-
-                {loading && (
-                    <div className="flex justify-start animate-fade-in">
-                        <div className="w-7 h-7 rounded-xl bg-dunr-orange/20 flex items-center justify-center shrink-0 mr-2 mt-1">
-                            <Bot size={14} className="text-dunr-orange" />
-                        </div>
-                        <div className="bg-white/5 border border-white/5 rounded-2xl rounded-bl-sm">
-                            <TypingDots />
-                        </div>
-                    </div>
+                    </>
                 )}
-
                 <div ref={bottomRef} />
             </div>
 
-            {/* Quick questions — only shown at start */}
-            {messages.length <= 1 && (
+            {/* Quick questions */}
+            {showQuickQuestions && !loadingHistory && (
                 <div className="px-4 pb-3 flex gap-2 overflow-x-auto shrink-0 no-scrollbar">
                     {QUICK_QUESTIONS.map(q => (
                         <button
