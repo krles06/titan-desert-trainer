@@ -1,9 +1,10 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CalendarDays, User } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, User, Bot } from 'lucide-react'
 
 const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/calendar', icon: CalendarDays, label: 'Calendario' },
+    { to: '/coach', icon: Bot, label: 'Coach' },
     { to: '/profile', icon: User, label: 'Perfil' },
 ]
 
@@ -11,7 +12,7 @@ export default function BottomNav() {
     const location = useLocation()
 
     // Hide on landing, auth, and onboarding pages
-    const hiddenPaths = ['/', '/login', '/register', '/forgot-password', '/onboarding', '/generate-plan']
+    const hiddenPaths = ['/', '/login', '/register', '/forgot-password', '/onboarding', '/generate-plan', '/coach']
     if (hiddenPaths.includes(location.pathname)) return null
 
     return (

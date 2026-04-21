@@ -16,6 +16,7 @@ import SessionDetail from './pages/SessionDetail'
 import Profile from './pages/Profile'
 import Subscription from './pages/Subscription'
 import Legal from './pages/Legal'
+import CoachChat from './pages/CoachChat'
 
 export default function App() {
   return (
@@ -51,6 +52,9 @@ export default function App() {
             } />
             <Route path="/subscription" element={
               <ProtectedRoute><Subscription /></ProtectedRoute>
+            } />
+            <Route path="/coach" element={
+              <ProtectedRoute><CoachChat /></ProtectedRoute>
             } />
           </Routes>
           <BottomNav />
