@@ -61,8 +61,9 @@ export default function GeneratePlan() {
                     setHasActivePlan(true)
                     setProgress(100)
 
-                    // Fetch plan summary
-                    await buildSummary(data.plan_id, data.is_phase_1)
+                    // Small delay to ensure DB commit is visible
+                    await new Promise(r => setTimeout(r, 800))
+                    await buildSummary(data.is_phase_1)
                 }
             } catch (err) {
                 setError(err.message || 'Error al generar el plan')
@@ -76,13 +77,12 @@ export default function GeneratePlan() {
         }
     }, [navigate, profile])
 
-    async function buildSummary(planId, isPhase1) {
+    async function buildSummary(isPhase1) {
         const today = new Date().toISOString().split('T')[0]
 
         const { data: sessions } = await supabase
             .from('sessions')
             .select('tipo, duracion_min, semana, fecha')
-            .eq('plan_id', planId)
             .order('fecha', { ascending: true })
 
         if (!sessions?.length) { navigate('/dashboard'); return }
