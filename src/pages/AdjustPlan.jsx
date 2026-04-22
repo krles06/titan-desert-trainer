@@ -92,7 +92,7 @@ export default function AdjustPlan() {
         const weeks = new Set(future.map(s => s.semana)).size
         const totalMin = future.reduce((sum, s) => sum + (s.duracion_min || 0), 0)
 
-        const typeCount: Record<string, number> = {}
+        const typeCount = {}
         future.forEach(s => { typeCount[s.tipo] = (typeCount[s.tipo] || 0) + 1 })
         const typeBreakdown = Object.entries(typeCount)
             .map(([tipo, count]) => ({ tipo, count, pct: Math.round((count / future.length) * 100) }))
