@@ -284,7 +284,7 @@ export default function SessionDetail() {
 
                 {/* ── COMPLETED STATE ── */}
                 {session.completada && !showEditForm && (
-                    <div className="glass-card p-5 animate-fade-in border border-emerald-500/15 bg-emerald-500/3" style={{ animationDelay: '0.12s' }}>
+                    <div className="glass-card p-5 animate-fade-in border border-emerald-500/15 bg-emerald-500/3" style={{ animationDelay: '0.24s' }}>
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center">
@@ -357,7 +357,7 @@ export default function SessionDetail() {
 
                 {/* ── FORM (not completed OR editing) ── */}
                 {(!session.completada || showEditForm) && (
-                    <div className="glass-card p-5 animate-fade-in" style={{ animationDelay: '0.15s' }}>
+                    <div className="glass-card p-5 animate-fade-in" style={{ animationDelay: '0.24s' }}>
                         {showEditForm && (
                             <div className="flex items-center justify-between mb-5">
                                 <h3 className="text-sm font-black text-white uppercase tracking-tight">Editar datos</h3>
