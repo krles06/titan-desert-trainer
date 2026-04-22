@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { DEMO_MODE, DEMO_SESSIONS } from '../lib/mockData'
 import { supabase } from '../lib/supabase'
@@ -8,15 +8,26 @@ import ProgressCharts from '../components/ProgressCharts'
 import WeeklySummary from '../components/WeeklySummary'
 import {
     TrendingUp, Clock, Calendar, Flame, ChevronRight,
-    CheckCircle, Zap, Target, RefreshCw
+    CheckCircle, Zap, Target, RefreshCw, X
 } from 'lucide-react'
 import { getRaceById } from '../lib/races'
 
+const ADJUST_REASONS = [
+    { id: 'lesion', label: '🩹 He tenido una lesión o pausa', desc: 'Recalcula el plan desde hoy adaptando la carga a tu estado actual.' },
+    { id: 'mas_carga', label: '💪 Quiero más intensidad', desc: 'Aumenta la exigencia de las próximas semanas.' },
+    { id: 'menos_carga', label: '🧘 Estoy demasiado cansado', desc: 'Reduce la carga para recuperarte correctamente.' },
+    { id: 'sesiones_perdidas', label: '📅 He perdido muchas sesiones', desc: 'Reorganiza el plan teniendo en cuenta las sesiones no completadas.' },
+    { id: 'cambio_dias', label: '🔄 Han cambiado mis días disponibles', desc: 'Adapta las sesiones a tus nuevos días libres.' },
+]
+
 export default function Dashboard() {
     const { profile, user } = useAuth()
+    const navigate = useNavigate()
     const [sessions, setSessions] = useState([])
     const [plan, setPlan] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [showAdjustModal, setShowAdjustModal] = useState(false)
+    const [selectedReason, setSelectedReason] = useState(null)
 
     useEffect(() => {
         async function loadDashboardData() {
@@ -147,6 +158,7 @@ export default function Dashboard() {
     }
 
     return (
+        <>
         <div className="min-h-screen bg-dunr-black pb-24">
             {/* Header */}
             <div className="gradient-desert px-4 pt-6 pb-10">
@@ -225,9 +237,9 @@ export default function Dashboard() {
                                         </p>
                                     </div>
                                 </div>
-                                <Link to={`/generate-plan?reason=${stats.needsReadjustment}`} className="btn-primary w-full py-2.5 text-xs shadow-none">
-                                    Recalcular macrociclo con DUNR
-                                </Link>
+                                <button onClick={() => { setSelectedReason(stats.needsReadjustment); setShowAdjustModal(true) }} className="btn-primary w-full py-2.5 text-xs shadow-none">
+                                    Ajustar plan con DUNR
+                                </button>
                             </div>
                         )}
 
@@ -343,10 +355,67 @@ export default function Dashboard() {
                             <ProgressCharts sessions={sessions} />
                         </div>
 
+                        {/* Adjust plan button */}
+                        {sessions.some(s => s.completada) && (
+                            <div className="mt-6 mb-2">
+                                <button
+                                    onClick={() => { setSelectedReason(null); setShowAdjustModal(true) }}
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/8 bg-white/3 text-white/40 text-[11px] font-black uppercase tracking-widest hover:border-white/15 hover:text-white/60 transition-all"
+                                >
+                                    <RefreshCw size={13} />
+                                    Ajustar mi plan con IA
+                                </button>
+                            </div>
+                        )}
+
                         <div className="mt-8 mb-4 border-t border-white/5 opacity-50" />
                     </>
                 )}
             </div>
-        </div >
+        </div>
+
+        {/* Adjust Plan Modal */}
+        {showAdjustModal && (
+            <div className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-4 animate-fade-in">
+                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowAdjustModal(false)} />
+                <div className="relative w-full max-w-lg bg-[#0d0d0d] border border-white/8 rounded-3xl p-6 shadow-2xl">
+                    {/* Handle */}
+                    <div className="w-10 h-1 bg-white/10 rounded-full mx-auto mb-5" />
+
+                    <div className="flex items-center justify-between mb-5">
+                        <div>
+                            <h3 className="text-base font-black text-white uppercase tracking-tight">Ajustar mi plan</h3>
+                            <p className="text-[10px] text-white/30 mt-0.5">La IA regenerará las sesiones futuras manteniendo tu historial</p>
+                        </div>
+                        <button onClick={() => setShowAdjustModal(false)} className="text-white/20 hover:text-white/60 transition-colors">
+                            <X size={18} />
+                        </button>
+                    </div>
+
+                    <div className="space-y-2 mb-5">
+                        {ADJUST_REASONS.map(r => (
+                            <button key={r.id} onClick={() => setSelectedReason(r.id)}
+                                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${selectedReason === r.id ? 'border-dunr-orange bg-dunr-orange/5' : 'border-white/5 bg-white/3 hover:border-white/15'}`}>
+                                <span className={`font-black text-sm ${selectedReason === r.id ? 'text-dunr-orange' : 'text-white'}`}>{r.label}</span>
+                                <p className="text-[11px] text-white/35 mt-0.5 leading-relaxed">{r.desc}</p>
+                            </button>
+                        ))}
+                    </div>
+
+                    <button
+                        disabled={!selectedReason}
+                        onClick={() => {
+                            setShowAdjustModal(false)
+                            navigate(`/adjust-plan?reason=${selectedReason}`)
+                        }}
+                        className="btn-primary w-full !py-4 !text-xs !font-black !uppercase !tracking-widest disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                        <RefreshCw size={14} />
+                        Regenerar sesiones futuras
+                    </button>
+                </div>
+            </div>
+        )}
+        </>
     )
 }

@@ -18,6 +18,7 @@ import Profile from './pages/Profile'
 import Subscription from './pages/Subscription'
 import Legal from './pages/Legal'
 import CoachChat from './pages/CoachChat'
+import AdjustPlan from './pages/AdjustPlan'
 
 export default function App() {
   return (
@@ -56,6 +57,9 @@ export default function App() {
             } />
             <Route path="/coach" element={
               <ProtectedRoute><CoachChat /></ProtectedRoute>
+            } />
+            <Route path="/adjust-plan" element={
+              <ProtectedRoute><AdjustPlan /></ProtectedRoute>
             } />
           </Routes>
           <BottomNav />
