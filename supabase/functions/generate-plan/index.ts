@@ -118,8 +118,16 @@ ${reason ? `══ MOTIVO DE AJUSTE ══\n${reason}\n` : ''}
 - RODAJE: objetivo fisiológico en una frase, zona/RPE de trabajo, sensación buscada.
 - DESCANSO ACTIVO: explicación del motivo fisiológico (supercompensación), actividad alternativa sugerida si aplica.
 
+══ METADATOS ESTRUCTURADOS (campo "metadata" OBLIGATORIO en cada sesión) ══
+Según el tipo, genera el objeto "metadata" correspondiente con valores reales coherentes con la sesión:
+- 'intervalos': {"cal_min":int,"series":int,"ser_min":float,"ser_zona":int,"ser_rpe":int,"rec_min":float,"cal_final_min":int}
+- 'fuerza':     {"cal_min":int,"reps":int,"rep_min":float,"pendiente_pct":int,"zona":int,"rpe":int,"rec_min":float,"cal_final_min":int}
+- 'largo':      {"zona":int,"nutricion_min":int,"hidratacion_min":int,"calorias_hora":int}
+- 'rodaje':     {"zona":int,"rpe":int,"objetivo":"frase corta max 6 palabras"}
+- 'descanso activo': {"zona_max":1,"rpe_max":int,"actividades":["string","string","string"]}
+
 Responde EXCLUSIVAMENTE en JSON:
-{"sesiones":[{"semana":int,"dia_semana":string,"fecha":"YYYY-MM-DD","tipo":string,"duracion_min":int,"distancia_km":float,"intensidad_zona":1-5,"descripcion":string}],"advertencias":[{"semana":int,"tipo":"alerta_media","mensaje":string}]}`
+{"sesiones":[{"semana":int,"dia_semana":string,"fecha":"YYYY-MM-DD","tipo":string,"duracion_min":int,"distancia_km":float,"intensidad_zona":1-5,"descripcion":string,"metadata":{}}],"advertencias":[{"semana":int,"tipo":"alerta_media","mensaje":string}]}`
 
         const userPrompt = `Genera el plan completo de ${totalWeeks} semanas.
 Atleta: ${profile.nombre} | Nivel: ${profile.nivel_experiencia} | Objetivo: ${profile.objetivo_carrera === 'competir' ? 'competir' : 'terminar'} | Día fuerte: ${profile.dia_fuerte}
@@ -204,6 +212,7 @@ ${isPhase1 ? 'GENERAR SOLO LAS PRIMERAS 12 SEMANAS (Fase 1 de 2).' : ''}`
             distancia_km: s.distancia_km || 20,
             intensidad_zona: Math.max(1, Math.min(5, parseInt(s.intensidad_zona) || 2)),
             descripcion: s.descripcion || 'Entrenamiento del día',
+            metadata: s.metadata || null,
             completada: false
         }))
 

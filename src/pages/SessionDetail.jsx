@@ -7,6 +7,7 @@ import {
     MessageSquare, ChevronLeft, ChevronRight, Activity,
     ChevronDown, Gauge, Mountain, Zap, Edit2, X
 } from 'lucide-react'
+import SessionPlanVisual from '../components/SessionPlanVisual'
 
 const TYPE_META = {
     rodaje:            { label: 'Rodaje',         color: '#FACC15', bg: 'bg-yellow-500/10', text: 'text-yellow-400' },
@@ -277,6 +278,9 @@ export default function SessionDetail() {
                     </div>
                     <p className="text-sm text-white/85 leading-relaxed">{session.descripcion}</p>
                 </div>
+
+                {/* Type-specific visual plan */}
+                <SessionPlanVisual session={session} />
 
                 {/* ── COMPLETED STATE ── */}
                 {session.completada && !showEditForm && (
