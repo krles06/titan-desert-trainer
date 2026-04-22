@@ -1,5 +1,4 @@
 // Supabase Edge Function: generate-plan
-// Calls Google Gemini API to generate a personalized training plan
 // Deploy with: supabase functions deploy generate-plan
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -10,7 +9,6 @@ const corsHeaders = {
 }
 
 Deno.serve(async (req) => {
-    // Handle CORS preflight
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
@@ -26,14 +24,11 @@ Deno.serve(async (req) => {
         }
 
         const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
-        if (!OPENAI_API_KEY) {
-            throw new Error('OPENAI_API_KEY not configured')
-        }
+        if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not configured')
 
         const today = new Date()
         const todayStr = today.toISOString().split('T')[0]
 
-        // Races definition (must match src/lib/races.js)
         const RACES = [
             { id: 'morocco-2026', name: 'Škoda Morocco Titan Desert', date: '2026-04-26' },
             { id: 'almeria-2026', name: 'Titan Desert Almería', date: '2026-10-01' }
@@ -43,7 +38,7 @@ Deno.serve(async (req) => {
         let raceDateStr = ''
 
         if (profile.carrera_id === 'custom') {
-            raceName = `Objetivo Personalizado (${profile.objetivo_distancia}km, ${profile.objetivo_desnivel}m de desnivel, terreno: ${profile.objetivo_terreno})`
+            raceName = `Objetivo Personalizado (${profile.objetivo_distancia}km, ${profile.objetivo_desnivel}m desnivel, terreno: ${profile.objetivo_terreno})`
             raceDateStr = profile.objetivo_fecha
         } else {
             const race = RACES.find(r => r.id === profile.carrera_id) || RACES[0]
@@ -52,49 +47,84 @@ Deno.serve(async (req) => {
         }
 
         const raceDate = new Date(raceDateStr)
-
-        // Calculate weeks until race
         const diffTime = raceDate.getTime() - today.getTime()
         let totalWeeks = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)), 1)
         let isPhase1 = false
 
-        // CAP: If more than 16 weeks, generate only phase 1 (12 weeks) to avoid WORKER_LIMIT
         if (totalWeeks > 16) {
             totalWeeks = 12
             isPhase1 = true
         }
 
-        const systemPrompt = `Entrenador de ciclismo experto en MTB y carreras por etapas como la Titan Desert. 
-Genera un plan de entrenamiento de ${totalWeeks} semanas para la carrera o reto: ${raceName}.
+        // ── Build athlete profile context ──
+        const objetivoDesc = profile.objetivo_carrera === 'competir'
+            ? 'COMPETIR y lograr el mejor tiempo posible — incluir trabajo de umbral, ritmo de carrera, series de calidad y sesiones de tempo'
+            : 'TERMINAR la carrera con seguridad — prioridad absoluta en resistencia aeróbica, gestión del esfuerzo y prevención de lesiones'
 
-REGLAS CRÍTICAS DE PLANIFICACIÓN:
-- LAS SESIONES DEBEN EXPLICAR EXACTAMENTE CÓMO EJECUTAR EL ENTRENAMIENTO.
-- NINGUNA SESIÓN puede programarse en la fecha exacta del evento (${raceDateStr}) ni después.
-- La ÚLTIMA SESIÓN del plan debe ser al menos 2 DÍAS ANTES de la fecha del evento para asegurar el tapering.
-- PRIORIDAD "DÍA FUERTE": El día marcado como "${profile.dia_fuerte}" en el perfil debe tener siempre la sesión más exigente de la semana (Largo o Intervalos).
-- FRECUENCIA DE DESCANSO ACTIVO: Solo deben aparecer cada 3 o 4 semanas, nunca en semanas consecutivas.
-- PROGRESIÓN DE RODAJES: La distancia de los rodajes debe aumentarse progresivamente cada semana. Nunca repitas la misma distancia dos semanas consecutivas.
+        const intensityMode = profile.tiene_pulsometro
+            ? 'El atleta TIENE pulsómetro/potenciómetro: prescribe zonas de FC exactas (Z1-Z5) en cada sesión con rangos numéricos de ppm si es posible.'
+            : 'El atleta NO tiene pulsómetro: describe intensidades exclusivamente con escala de esfuerzo percibido RPE (1-10). Evita mencionar zonas FC.'
+
+        const lesionesRaw = (profile.lesiones || []).filter((l: string) => l !== 'ninguna')
+        const lesionesDesc = lesionesRaw.length > 0
+            ? `LIMITACIONES FÍSICAS: ${lesionesRaw.join(', ')}. ADAPTA los ejercicios de fuerza y las sesiones técnicas para NO sobrecargar estas zonas. Evita ejercicios que impliquen impacto o tensión directa sobre ellas.`
+            : 'Sin lesiones ni limitaciones físicas conocidas.'
+
+        const terrenoDesc = {
+            montana: 'montaña y pistas de tierra — diseña sesiones realistas en tierra/grava con desnivel; los rodajes pueden ser en monte',
+            mixto: 'mixto asfalto y tierra — alterna sesiones en carretera con sesiones en pistas; adapta las descripciones a ambos entornos',
+            asfalto: 'principalmente asfalto — adapta todas las sesiones a carretera o carril bici; simula el esfuerzo de desnivel con series en llano cuando sea necesario'
+        }[profile.terreno_habitual || 'mixto'] || 'mixto'
+
+        const systemPrompt = `Eres un entrenador de ciclismo de élite especializado en MTB y carreras por etapas como la Titan Desert.
+Genera un plan de entrenamiento de ${totalWeeks} semanas para: ${raceName}.
+
+══ PERFIL COMPLETO DEL ATLETA ══
+- Nombre: ${profile.nombre} | Nivel: ${profile.nivel_experiencia}
+- Edad: ${profile.edad} años | Peso: ${profile.peso} kg | Altura: ${profile.altura} cm
+- Velocidad media: ${profile.velocidad_media} km/h | Distancia máxima rodada: ${profile.distancia_maxima} km
+- FC en reposo: ${profile.fc_reposo} ppm
+- Tipo de bici: ${profile.tipo_bici || 'MTB hardtail'}
+- Terreno habitual: ${terrenoDesc}
+- Experiencia previa en la Titan: ${profile.participado_antes ? 'SÍ — conoce el formato y el desgaste de etapas' : 'NO — primer contacto con este tipo de carrera'}
+- Días de entreno: ${profile.dias_preferidos?.join(', ') || 'Lunes, Miércoles, Viernes, Domingo'} | Día fuerte: ${profile.dia_fuerte}
+- Disponibilidad diaria: ${profile.minutos_dia} min/sesión
+
+══ OBJETIVO DE CARRERA ══
+${objetivoDesc}
+
+══ PRESCRIPCIÓN DE INTENSIDAD ══
+${intensityMode}
+
+══ SALUD Y LIMITACIONES ══
+${lesionesDesc}
+
+${reason ? `══ MOTIVO DE AJUSTE ══\n${reason}\n` : ''}
+
+══ REGLAS CRÍTICAS DE PLANIFICACIÓN ══
+- NINGUNA sesión puede programarse en la fecha del evento (${raceDateStr}) ni después.
+- La ÚLTIMA sesión del plan debe ser al menos 2 días antes del evento (tapering).
+- PRIORIDAD DÍA FUERTE: "${profile.dia_fuerte}" siempre recibe la sesión más exigente de la semana (Largo o Intervalos de alta intensidad).
+- DESCANSO ACTIVO: solo cada 3–4 semanas, nunca en semanas consecutivas.
+- PROGRESIÓN: distancia de rodajes y largos debe aumentar cada semana. Nunca repitas la misma distancia dos semanas seguidas.
 - EL PLAN EMPIEZA HOY: ${todayStr}.
-- Genera una sesión para cada día de entrenamiento solicitado: ${profile.dias_preferidos?.join(', ') || 'Lunes, Miércoles, Viernes, Domingo'}.
-- Tipos de sesión: 'rodaje', 'intervalos', 'fuerza', 'descanso activo', 'largo'.
+- Genera exactamente una sesión por día de entreno solicitado: ${profile.dias_preferidos?.join(', ')}.
+- Tipos válidos: 'rodaje', 'intervalos', 'fuerza', 'descanso activo', 'largo'.
 
-DESCRIPCIONES DETALLADAS OBLIGATORIAS:
-  - Para INTERVALOS: Escribe el calentamiento, las series exactas con su duración e intensidad, y el tiempo de recuperación exacto entre series.
-  - Para FUERZA: Escribe la pendiente buscada (en %), desarrollos (marchas) recomendados, número de repeticiones y recuperación.
-  - Para LARGO: Indica zona de intensidad, técnica de pedaleo y consejos precisos de nutrición e hidratación.
-  - Para RODAJE: Indica el objetivo fisiológico de la sesión en una frase concisa.
-  - Para DESCANSO ACTIVO: Explica por qué es vital para la supercompensación ese día concreto.
+══ DESCRIPCIONES OBLIGATORIAS POR TIPO ══
+- INTERVALOS: calentamiento específico (duración y zona), series exactas (número × duración × intensidad ${profile.tiene_pulsometro ? 'en FC/zona' : 'en RPE'}), recuperación entre series, vuelta a la calma.
+- FUERZA (subidas): pendiente objetivo en %, desarrollo/marcha recomendado, nº de repeticiones, duración de cada subida, recuperación.
+- LARGO: zona de intensidad predominante, estrategia de nutrición e hidratación (qué comer y cada cuánto), consejos técnicos para el tipo de bici "${profile.tipo_bici || 'MTB'}".
+- RODAJE: objetivo fisiológico en una frase, zona/RPE de trabajo, sensación buscada.
+- DESCANSO ACTIVO: explicación del motivo fisiológico (supercompensación), actividad alternativa sugerida si aplica.
 
-- Responde EXCLUSIVAMENTE en JSON con este formato:
-{
-  "sesiones": [{"semana": int, "dia_semana": string, "fecha": "YYYY-MM-DD", "tipo": string, "duracion_min": int, "distancia_km": float, "intensidad_zona": 1-5, "descripcion": string}],
-  "advertencias": [{"semana": int, "tipo": "alerta_media", "mensaje": string}]
-}`;
+Responde EXCLUSIVAMENTE en JSON:
+{"sesiones":[{"semana":int,"dia_semana":string,"fecha":"YYYY-MM-DD","tipo":string,"duracion_min":int,"distancia_km":float,"intensidad_zona":1-5,"descripcion":string}],"advertencias":[{"semana":int,"tipo":"alerta_media","mensaje":string}]}`
 
-        const userPrompt = `Usuario: ${profile.nombre}, Nivel: ${profile.nivel_experiencia}, Día fuerte: ${profile.dia_fuerte}. 
-INICIO: ${todayStr}. 
-OBJETIVO: ${raceName}. 
-${isPhase1 ? 'GENERAR SOLO PRIMERAS 12 SEMANAS.' : ''}`;
+        const userPrompt = `Genera el plan completo de ${totalWeeks} semanas.
+Atleta: ${profile.nombre} | Nivel: ${profile.nivel_experiencia} | Objetivo: ${profile.objetivo_carrera === 'competir' ? 'competir' : 'terminar'} | Día fuerte: ${profile.dia_fuerte}
+Inicio: ${todayStr} | Carrera: ${raceName} (${raceDateStr})
+${isPhase1 ? 'GENERAR SOLO LAS PRIMERAS 12 SEMANAS (Fase 1 de 2).' : ''}`
 
         const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
             method: 'POST',
@@ -105,71 +135,64 @@ ${isPhase1 ? 'GENERAR SOLO PRIMERAS 12 SEMANAS.' : ''}`;
                 response_format: { type: "json_object" },
                 temperature: 0.1,
             }),
-        });
+        })
 
-        if (!gptResponse.ok) throw new Error(`OpenAI error: ${gptResponse.status}`);
-        const gptData = await gptResponse.json();
-        let responseText: string | null = gptData.choices[0].message.content;
-        const planData = JSON.parse(responseText!);
+        if (!gptResponse.ok) throw new Error(`OpenAI error: ${gptResponse.status}`)
+        const gptData = await gptResponse.json()
+        let responseText: string | null = gptData.choices[0].message.content
+        const planData = JSON.parse(responseText!)
+        responseText = null
 
-        // Memory Cleanup: Nullify large strings as soon as possible
-        responseText = null;
-
-        // --- Robust Session Extraction ---
         const sessionsRaw = planData.sesiones || planData.sessions ||
-            planData.plan?.sesiones || planData.plan?.sessions || [];
+            planData.plan?.sesiones || planData.plan?.sessions || []
 
         if (!Array.isArray(sessionsRaw) || sessionsRaw.length === 0) {
-            throw new Error('No se detectaron sesiones en la respuesta de la IA.');
+            throw new Error('No se detectaron sesiones en la respuesta de la IA.')
         }
 
-        const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-        const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
-        const token = authHeader?.replace('Bearer ', '') ?? '';
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        const authHeader = req.headers.get('Authorization') || req.headers.get('authorization')
+        const token = authHeader?.replace('Bearer ', '') ?? ''
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
-        if (authError || !user) {
-            throw new Error('Sesión no autorizada');
-        }
+        if (authError || !user) throw new Error('Sesión no autorizada')
 
-        console.log(`Generating plan for user: ${user.id} (${totalWeeks} weeks) ${isPhase1 ? '(Phase 1)' : ''}`);
+        console.log(`Generating plan for user: ${user.id} (${totalWeeks} weeks) ${isPhase1 ? '(Phase 1)' : ''}`)
 
-        // Borrar planes y sesiones antiguos
-        const { error: deleteError } = await supabase.from('training_plans').delete().eq('user_id', user.id);
-        if (deleteError) console.warn('Warning deleting old plans:', deleteError);
+        // Delete old plans
+        const { error: deleteError } = await supabase.from('training_plans').delete().eq('user_id', user.id)
+        if (deleteError) console.warn('Warning deleting old plans:', deleteError)
 
-        // Insertar nuevo plan
+        // Insert new plan
         const { data: plan, error: planError } = await supabase.from('training_plans').insert({
             user_id: user.id,
             plan_json: planData,
             activo: true
-        }).select().single();
+        }).select().single()
 
-        if (planError || !plan) throw new Error(`Error al crear plan: ${planError?.message}`);
+        if (planError || !plan) throw new Error(`Error al crear plan: ${planError?.message}`)
 
-        // --- Session Type Mapping ---
         const mapType = (type: string) => {
-            const t = type?.toLowerCase() || 'rodaje';
-            if (t.includes('interv') || t.includes('seri')) return 'intervalos';
-            if (t.includes('fuerz') || t.includes('cuest')) return 'fuerza';
-            if (t.includes('descans') || t.includes('activ') || t.includes('recup')) return 'descanso activo';
-            if (t.includes('larg') || t.includes('fond')) return 'largo';
-            return 'rodaje';
-        };
+            const t = type?.toLowerCase() || 'rodaje'
+            if (t.includes('interv') || t.includes('seri')) return 'intervalos'
+            if (t.includes('fuerz') || t.includes('cuest')) return 'fuerza'
+            if (t.includes('descans') || t.includes('activ') || t.includes('recup')) return 'descanso activo'
+            if (t.includes('larg') || t.includes('fond')) return 'largo'
+            return 'rodaje'
+        }
 
-        // --- Date Normalization Helper ---
         const normalizeDate = (dateStr: string) => {
-            if (!dateStr) return todayStr;
+            if (!dateStr) return todayStr
             if (dateStr.endsWith('-02-29')) {
-                const year = parseInt(dateStr.split('-')[0]);
-                const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-                if (!isLeap) return `${year}-03-01`;
+                const year = parseInt(dateStr.split('-')[0])
+                const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
+                if (!isLeap) return `${year}-03-01`
             }
-            return dateStr;
-        };
+            return dateStr
+        }
 
         const sessionsToInsert = sessionsRaw.map((s: any) => ({
             plan_id: plan.id,
@@ -182,36 +205,36 @@ ${isPhase1 ? 'GENERAR SOLO PRIMERAS 12 SEMANAS.' : ''}`;
             intensidad_zona: Math.max(1, Math.min(5, parseInt(s.intensidad_zona) || 2)),
             descripcion: s.descripcion || 'Entrenamiento del día',
             completada: false
-        }));
+        }))
 
-        console.log(`Inserting ${sessionsToInsert.length} sessions in chunks...`);
+        console.log(`Inserting ${sessionsToInsert.length} sessions...`)
 
-        const CHUNK_SIZE = 40; // Slightly smaller chunks to be extra safe
+        const CHUNK_SIZE = 40
         for (let i = 0; i < sessionsToInsert.length; i += CHUNK_SIZE) {
-            const chunk = sessionsToInsert.slice(i, i + CHUNK_SIZE);
-            const { error: sessionsError } = await supabase.from('sessions').insert(chunk);
-            if (sessionsError) {
-                console.error(`Error in chunk ${i}:`, sessionsError);
-                throw new Error(`Error DB Sesiones: ${sessionsError.message}`);
-            }
+            const chunk = sessionsToInsert.slice(i, i + CHUNK_SIZE)
+            const { error: sessionsError } = await supabase.from('sessions').insert(chunk)
+            if (sessionsError) throw new Error(`Error DB Sesiones: ${sessionsError.message}`)
         }
 
-        // Final Verify
         const { count } = await supabase
             .from('sessions')
             .select('*', { count: 'exact', head: true })
-            .eq('plan_id', plan.id);
+            .eq('plan_id', plan.id)
 
-        console.log(`Verified insertion: ${count} sessions in DB.`);
+        console.log(`Verified: ${count} sessions in DB.`)
 
         return new Response(JSON.stringify({
             success: true,
             is_phase_1: isPhase1,
-            count: count,
+            count,
             plan_id: plan.id
-        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+
     } catch (error) {
-        console.error('Final error:', error);
-        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        console.error('Final error:', error)
+        return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
     }
-});
+})
