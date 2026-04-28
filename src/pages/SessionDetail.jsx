@@ -8,6 +8,7 @@ import {
     ChevronDown, Gauge, Mountain, Zap, Edit2, X
 } from 'lucide-react'
 import SessionPlanVisual from '../components/SessionPlanVisual'
+import DunrLogo from '../components/DunrLogo'
 
 const TYPE_META = {
     rodaje:            { label: 'Rodaje',         color: '#FACC15', bg: 'bg-yellow-500/10', text: 'text-yellow-400' },
@@ -29,6 +30,7 @@ function Toast({ message, onClose }) {
     useEffect(() => {
         const t = setTimeout(onClose, 2800)
         return () => clearTimeout(t)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     return (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
@@ -189,6 +191,7 @@ export default function SessionDetail() {
                         <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-white/60 hover:text-white min-h-[44px] text-sm font-bold">
                             <ArrowLeft size={18} /> Volver
                         </button>
+                        <DunrLogo variant="mark" className="w-10" />
                         <div className="flex items-center gap-2">
                             <button onClick={() => navigate(`/session/${adjacent.prev}`)} disabled={!adjacent.prev}
                                 className={`p-2 rounded-xl border border-white/10 text-white transition-all ${!adjacent.prev ? 'opacity-20 pointer-events-none' : 'hover:bg-white/10'}`}>
@@ -461,17 +464,20 @@ export default function SessionDetail() {
                                             { label: 'FC Máxima (ppm)', key: 'fc_maxima', icon: Activity },
                                             { label: 'Desnivel (m)', key: 'desnivel', icon: Mountain },
                                             { label: 'Vel. media (km/h)', key: 'velocidad', icon: Gauge, step: '0.1' },
-                                        ].map(({ label, key, icon: Icon, step }) => (
-                                            <div key={key} className="relative">
-                                                <label className="block text-[9px] font-bold text-white/25 uppercase tracking-wider mb-1.5 ml-1">{label}</label>
-                                                <div className="relative">
-                                                    <Icon size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/15" />
-                                                    <input type="number" step={step} value={realStats[key]}
-                                                        onChange={e => setRealStats(p => ({ ...p, [key]: e.target.value }))}
-                                                        className="input-field !py-2.5 !pl-8 !text-sm" placeholder="0" />
+                                        ].map(({ label, key, icon, step }) => {
+                                            const FieldIcon = icon
+                                            return (
+                                                <div key={key} className="relative">
+                                                    <label className="block text-[9px] font-bold text-white/25 uppercase tracking-wider mb-1.5 ml-1">{label}</label>
+                                                    <div className="relative">
+                                                        <FieldIcon size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/15" />
+                                                        <input type="number" step={step} value={realStats[key]}
+                                                            onChange={e => setRealStats(p => ({ ...p, [key]: e.target.value }))}
+                                                            className="input-field !py-2.5 !pl-8 !text-sm" placeholder="0" />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            )
+                                        })}
                                         <div className="col-span-2 relative">
                                             <label className="block text-[9px] font-bold text-white/25 uppercase tracking-wider mb-1.5 ml-1">Cadencia media (rpm)</label>
                                             <div className="relative">

@@ -82,12 +82,15 @@ Deno.serve(async (req) => {
             raceName = `Objetivo Personalizado (${profile.objetivo_distancia}km, terreno: ${profile.objetivo_terreno})`
             raceDateStr = profile.objetivo_fecha
         } else {
-            const race = RACES.find((r: any) => r.id === profile.carrera_id) || RACES[0]
+            const race = RACES.find((r: any) => r.id === profile.carrera_id) || RACES.find((r: any) => new Date(r.date) > today) || RACES[RACES.length - 1]
             raceName = race.name
             raceDateStr = race.date
         }
 
         const raceDate = new Date(raceDateStr)
+        if (raceDate <= today) {
+            throw new Error('La fecha de este objetivo ya ha empezado o ha pasado. Elige una carrera futura o crea un objetivo personalizado.')
+        }
         const diffTime = raceDate.getTime() - today.getTime()
         const totalWeeks = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)), 1)
 

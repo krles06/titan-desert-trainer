@@ -1,8 +1,3 @@
-// Supabase Edge Function: create-checkout-session
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-console.log("create-checkout-session function initialized")
-
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -14,19 +9,9 @@ Deno.serve(async (req) => {
     }
 
     try {
-        const { returnUrl } = await req.json()
-        const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
-
-        if (!stripeSecretKey || stripeSecretKey.includes('placeholder')) {
-            return new Response(
-                JSON.stringify({ url: returnUrl + '?mock_checkout=success' }),
-                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            )
-        }
-
         return new Response(
-            JSON.stringify({ url: returnUrl + '?checkout_session=mock123' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: 'Las suscripciones todavía no están disponibles.' }),
+            { status: 501, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
     } catch (error) {
         console.error(error)

@@ -124,7 +124,7 @@ export default function ProgressCharts({ sessions }) {
                         Distribución por tipo
                     </h3>
                     <div className="space-y-3">
-                        {typeData.map(({ tipo, label, min, pct, h, color }) => (
+                        {typeData.map(({ tipo, label, pct, h, color }) => (
                             <div key={tipo}>
                                 <div className="flex justify-between items-center mb-1.5">
                                     <div className="flex items-center gap-2">

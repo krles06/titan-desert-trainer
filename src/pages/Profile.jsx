@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
     User, Mail, LogOut, RefreshCw, ChevronRight,
-    Save, Shield, Info, Mountain, Bike, Heart, AlertCircle
+    Save, Shield, Info, Bike, Heart, AlertCircle
 } from 'lucide-react'
+import DunrLogo from '../components/DunrLogo'
 
 const TIPO_BICI_LABELS = {
     hardtail: '🚵 Hardtail MTB',
@@ -412,10 +413,7 @@ export default function Profile() {
                 </div>
 
                 <div className="text-center py-6">
-                    <div className="flex items-center justify-center gap-1.5 text-white/15 mb-1">
-                        <Mountain size={13} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">DUNR</span>
-                    </div>
+                    <DunrLogo className="justify-center opacity-25 mb-1" markClassName="h-5" wordClassName="text-[10px] tracking-[0.2em]" />
                     <p className="text-[8px] font-black uppercase tracking-widest text-white/10">v1.3 · Preparación extrema</p>
                 </div>
             </div>

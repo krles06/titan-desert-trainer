@@ -9,6 +9,7 @@ import {
     MoveHorizontal, X, FileDown, FileSpreadsheet,
     Calendar as CalendarIcon
 } from 'lucide-react'
+import DunrLogo from '../components/DunrLogo'
 
 const TYPE_COLORS = {
     rodaje: { bg: 'bg-dunr-orange/10', text: 'text-dunr-orange-light', dot: 'bg-dunr-orange' },
@@ -221,7 +222,10 @@ export default function CalendarPage() {
                 <div className="max-w-lg mx-auto px-4 py-3">
                     {/* View toggle */}
                     <div className="flex items-center justify-between mb-3">
-                        <h1 className="text-xl font-black text-white tracking-tight uppercase">Calendario</h1>
+                        <div className="flex items-center gap-2">
+                            <DunrLogo variant="mark" className="w-10" />
+                            <h1 className="text-xl font-black text-white tracking-tight uppercase">Calendario</h1>
+                        </div>
                         <div className="flex items-center gap-2">
                             {/* Export Menu */}
                             <div className="relative">
@@ -401,7 +405,6 @@ function MonthView({ currentDate, sessionsByDate, today }) {
                     const dateStr = date.toISOString().split('T')[0]
                     const daySessions = sessionsByDate[dateStr] || []
                     const isToday = dateStr === today
-                    const hasCompleted = daySessions.some((s) => s.completada)
                     const allCompleted = daySessions.length > 0 && daySessions.every((s) => s.completada)
 
                     return (

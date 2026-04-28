@@ -1,5 +1,6 @@
 import { ChevronLeft, Shield, FileText, Info, Mail } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import DunrLogo from '../components/DunrLogo'
 
 export default function Legal() {
     const navigate = useNavigate()
@@ -84,6 +85,7 @@ export default function Legal() {
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Volver</span>
                     </button>
+                    <DunrLogo className="mb-5" markClassName="h-7" wordClassName="text-lg" />
                     <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Información Legal</h1>
                     <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em] mt-2">Transparencia y Seguridad</p>
                 </div>
@@ -103,7 +105,7 @@ export default function Legal() {
                 ))}
 
                 <div className="text-center pt-8 opacity-20">
-                    <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white">DUNR TRAINER © 2026</p>
+                    <DunrLogo className="justify-center" markClassName="h-5" wordClassName="text-[8px] tracking-[0.3em]" />
                 </div>
             </div>
         </div>

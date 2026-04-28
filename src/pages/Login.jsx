@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Mail, Lock, Eye, EyeOff, Mountain } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import DunrLogo from '../components/DunrLogo'
 
 export default function Login() {
     const { signIn } = useAuth()
@@ -40,12 +41,10 @@ export default function Login() {
             <div className="w-full max-w-sm relative z-10">
                 {/* Logo */}
                 <div className="text-center mb-8 sm:mb-10">
-                    <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
-                        <Mountain size={28} className="text-dunr-orange" />
+                    <div className="inline-flex items-center justify-center w-20 h-14 sm:w-24 sm:h-16 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
+                        <DunrLogo variant="mark" className="w-14 sm:w-16" />
                     </div>
-                    <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter mb-2">
-                        DUN<span className="text-dunr-orange">R</span>
-                    </h1>
+                    <DunrLogo className="justify-center mb-2" markClassName="hidden" wordClassName="text-4xl sm:text-5xl" />
                     <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Entrena para lo extremo</p>
                 </div>
 

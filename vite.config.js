@@ -9,7 +9,14 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png'],
+      includeAssets: [
+        'favicon.png',
+        'icon-192.png',
+        'icon-512.png',
+        'brand/dunr-logo-option-5-white.png',
+        'brand/dunr-logo-option-5-black.png',
+        'brand/dunr-logo-option-5-transparent.png',
+      ],
       manifest: {
         name: 'DUNR — Titan Desert Trainer',
         short_name: 'DUNR',
@@ -22,13 +29,13 @@ export default defineConfig({
         start_url: '/dashboard',
         icons: [
           {
-            src: '/favicon.png',
+            src: '/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/favicon.png',
+            src: '/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
@@ -38,22 +45,7 @@ export default defineConfig({
       workbox: {
         // Cache app shell and static assets
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        // Runtime caching strategies
         runtimeCaching: [
-          {
-            // Supabase API — NetworkFirst so data stays fresh, falls back to cache offline
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-cache',
-              networkTimeoutSeconds: 10,
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24, // 24h
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
           {
             // Google Fonts
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

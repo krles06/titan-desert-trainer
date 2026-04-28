@@ -1,15 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ShieldCheck } from 'lucide-react'
 
 export default function CookieBanner() {
-    const [visible, setVisible] = useState(false)
-
-    useEffect(() => {
-        const consent = localStorage.getItem('dunr_cookie_consent')
-        if (!consent) {
-            setVisible(true)
-        }
-    }, [])
+    const [visible, setVisible] = useState(() => !localStorage.getItem('dunr_cookie_consent'))
 
     const handleAccept = () => {
         localStorage.setItem('dunr_cookie_consent', 'true')

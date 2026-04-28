@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 
-const DEFAULT_DATE = '2026-04-26T00:00:00+01:00'
+const DEFAULT_DATE = '2026-10-01T00:00:00+02:00'
 
 function getTimeRemaining(targetDate) {
     const raceDate = new Date(targetDate || DEFAULT_DATE).getTime()
@@ -26,10 +26,13 @@ function CountdownUnit({ value, label, mini }) {
 
     useEffect(() => {
         if (prevValue.current !== value) {
-            setAnimate(true)
+            const start = setTimeout(() => setAnimate(true), 0)
             const t = setTimeout(() => setAnimate(false), 300)
             prevValue.current = value
-            return () => clearTimeout(t)
+            return () => {
+                clearTimeout(start)
+                clearTimeout(t)
+            }
         }
     }, [value])
 

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { RefreshCw, Calendar, Clock, Zap, CheckCircle, ChevronRight } from 'lucide-react'
+import DunrLogo from '../components/DunrLogo'
 
 const REASON_LABELS = {
     lesion: '🩹 Lesión o pausa prolongada',
@@ -30,7 +30,6 @@ const TYPE_META = {
 }
 
 export default function AdjustPlan() {
-    const { profile } = useAuth()
     const navigate = useNavigate()
     const [messageIndex, setMessageIndex] = useState(0)
     const [progress, setProgress] = useState(0)
@@ -41,6 +40,7 @@ export default function AdjustPlan() {
     const reason = params.get('reason') || ''
     const reasonLabel = REASON_LABELS[reason] || 'Ajuste de plan'
 
+    // Runs once when the adjustment screen opens; the URL reason is fixed for this flow.
     useEffect(() => {
         const msgInterval = setInterval(() => {
             setMessageIndex((i) => (i + 1) % loadingMessages.length)
@@ -75,6 +75,7 @@ export default function AdjustPlan() {
             clearInterval(progressInterval)
             clearTimeout(timeout)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function buildSummary() {
@@ -158,13 +159,16 @@ export default function AdjustPlan() {
                             { icon: Calendar, label: 'Semanas', value: summary.weeksRemaining },
                             { icon: Zap, label: 'Sesiones', value: summary.newSessions },
                             { icon: Clock, label: 'Horas', value: `${hours}h` },
-                        ].map(({ icon: Ic, label, value }) => (
-                            <div key={label} className="glass-card p-4 text-center">
-                                <Ic size={16} className="text-dunr-orange mx-auto mb-2" />
-                                <p className="text-2xl font-black text-white leading-none">{value}</p>
-                                <p className="text-[10px] text-white/30 uppercase font-bold tracking-wider mt-1">{label}</p>
-                            </div>
-                        ))}
+                        ].map(({ icon, label, value }) => {
+                            const StatIcon = icon
+                            return (
+                                <div key={label} className="glass-card p-4 text-center">
+                                    <StatIcon size={16} className="text-dunr-orange mx-auto mb-2" />
+                                    <p className="text-2xl font-black text-white leading-none">{value}</p>
+                                    <p className="text-[10px] text-white/30 uppercase font-bold tracking-wider mt-1">{label}</p>
+                                </div>
+                            )
+                        })}
                     </div>
 
                     {/* Type breakdown */}
@@ -230,8 +234,9 @@ export default function AdjustPlan() {
                 )}
 
                 <div className="relative mb-12">
-                    <div className="w-28 h-28 mx-auto rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-center animate-pulse-glow shadow-2xl shadow-dunr-orange/10">
-                        <Icon size={44} className="text-dunr-orange" />
+                    <div className="w-28 h-28 mx-auto rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm flex flex-col items-center justify-center gap-2 animate-pulse-glow shadow-2xl shadow-dunr-orange/10">
+                        <DunrLogo variant="mark" className="w-16" />
+                        <Icon size={18} className="text-dunr-orange/70" />
                     </div>
                     <div className="absolute -inset-4 mx-auto w-36 h-36">
                         <svg className="animate-spin-slow" viewBox="0 0 128 128">

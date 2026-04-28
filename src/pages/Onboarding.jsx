@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { ChevronRight, ChevronLeft, User, Activity, Calendar, Mountain, MapPin, Trophy, Bike } from 'lucide-react'
-import { RACES } from '../lib/races'
+import { ChevronRight, ChevronLeft, User, Activity, Calendar, MapPin, Trophy, Bike } from 'lucide-react'
+import { RACES, getDefaultRace, isRaceSelectable } from '../lib/races'
+import DunrLogo from '../components/DunrLogo'
 
 const STEPS = [
     { title: 'Tu reto', icon: Trophy },
@@ -51,7 +52,7 @@ export default function Onboarding() {
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState({})
     const [form, setForm] = useState({
-        carrera_id: RACES[0].id,
+        carrera_id: getDefaultRace().id,
         nombre: '',
         edad: '',
         peso: '',
@@ -190,7 +191,7 @@ export default function Onboarding() {
             <div className="gradient-desert px-4 pt-8 pb-12">
                 <div className="max-w-lg mx-auto text-center">
                     <div className="inline-flex items-center gap-2 mb-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-3 py-1">
-                        <Mountain size={14} className="text-dunr-orange" />
+                        <DunrLogo variant="mark" className="w-8" />
                         <span className="text-white/60 text-[10px] font-bold uppercase tracking-widest">DUNR TRAINER</span>
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-black text-white mb-8 tracking-tighter">PREPARA TU RETO</h1>
@@ -227,9 +228,11 @@ export default function Onboarding() {
                                 Elige el desafío para el que quieres prepararte
                             </p>
                             <div className="space-y-3">
-                                {RACES.map((race) => (
-                                    <button key={race.id} type="button" onClick={() => update('carrera_id', race.id)}
-                                        className={`w-full text-left p-5 rounded-2xl border-2 transition-all relative overflow-hidden ${form.carrera_id === race.id ? 'border-dunr-orange bg-dunr-orange/5 shadow-2xl shadow-dunr-orange/10' : 'border-white/5 bg-white/5 hover:border-white/20'}`}>
+                                {RACES.map((race) => {
+                                    const selectable = isRaceSelectable(race)
+                                    return (
+                                    <button key={race.id} type="button" disabled={!selectable} onClick={() => selectable && update('carrera_id', race.id)}
+                                        className={`w-full text-left p-5 rounded-2xl border-2 transition-all relative overflow-hidden ${!selectable ? 'opacity-45 cursor-not-allowed border-white/5 bg-white/[0.03]' : form.carrera_id === race.id ? 'border-dunr-orange bg-dunr-orange/5 shadow-2xl shadow-dunr-orange/10' : 'border-white/5 bg-white/5 hover:border-white/20'}`}>
                                         <div className="relative z-10">
                                             <div className="flex justify-between items-start mb-2">
                                                 <div>
@@ -238,8 +241,8 @@ export default function Onboarding() {
                                                         <MapPin size={10} /> {race.location}
                                                     </p>
                                                 </div>
-                                                <div className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${race.difficulty === 'Extrema' ? 'bg-red-500/20 text-red-400' : 'bg-dunr-orange/20 text-dunr-orange'}`}>
-                                                    {race.difficulty}
+                                                <div className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${!selectable ? 'bg-white/10 text-white/40' : race.difficulty === 'Extrema' ? 'bg-red-500/20 text-red-400' : 'bg-dunr-orange/20 text-dunr-orange'}`}>
+                                                    {selectable ? race.difficulty : 'Iniciada'}
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-white/5">
@@ -259,7 +262,8 @@ export default function Onboarding() {
                                         </div>
                                         {form.carrera_id === race.id && <div className="absolute -top-4 -right-4 w-24 h-24 bg-dunr-orange/10 rounded-full blur-2xl" />}
                                     </button>
-                                ))}
+                                    )
+                                })}
 
                                 {/* Custom */}
                                 <button type="button" onClick={() => update('carrera_id', 'custom')}

@@ -4,9 +4,10 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { DEMO_MODE } from '../lib/mockData'
 import { Check, Shield, Zap, ChevronLeft } from 'lucide-react'
+import DunrLogo from '../components/DunrLogo'
 
 export default function Subscription() {
-    const { profile, user } = useAuth()
+    const { profile } = useAuth()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
@@ -63,7 +64,7 @@ export default function Subscription() {
             if (data?.url) {
                 window.location.href = data.url
             }
-        } catch (err) {
+        } catch {
             setError('Error al abrir el portal de facturación')
         } finally {
             setLoading(false)
@@ -85,8 +86,8 @@ export default function Subscription() {
                     <ChevronLeft size={24} />
                 </button>
                 <div className="max-w-lg mx-auto text-center">
-                    <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-dunr-orange/10 rotate-3 animate-pulse-glow">
-                        <Zap size={40} className="text-dunr-orange" />
+                    <div className="w-24 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-dunr-orange/10 rotate-3 animate-pulse-glow">
+                        <DunrLogo variant="mark" className="w-16" />
                     </div>
                     <h1 className="text-4xl font-black text-white mb-3 tracking-tighter uppercase">
                         {isSubscribed ? 'TU SUSCRIPCIÓN' : 'POTENCIAL ILIMITADO'}

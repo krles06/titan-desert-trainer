@@ -4,6 +4,7 @@ import { DEMO_MODE, DEMO_USER, DEMO_PROFILE } from '../lib/mockData'
 
 const AuthContext = createContext({})
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
     return useContext(AuthContext)
 }

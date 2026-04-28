@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { DEMO_MODE, DEMO_SESSIONS, DEMO_PLAN } from '../lib/mockData'
 import { Bike, Mountain, Wind, ChevronRight, Calendar, Clock, Zap, CheckCircle } from 'lucide-react'
+import DunrLogo from '../components/DunrLogo'
 
 const loadingMessages = [
     { icon: Mountain, text: 'Analizando tu perfil de ciclista...' },
@@ -28,6 +29,7 @@ export default function GeneratePlan() {
     const [error, setError] = useState(null)
     const [summary, setSummary] = useState(null) // null = loading, object = ready
 
+    // Runs once when the generation screen opens; profile is captured from the submitted onboarding flow.
     useEffect(() => {
         const params = new URLSearchParams(window.location.search)
         const reason = params.get('reason')
@@ -75,6 +77,7 @@ export default function GeneratePlan() {
             clearInterval(progressInterval)
             clearTimeout(timeout)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigate, profile])
 
     async function buildSummary(isPhase1) {
@@ -172,13 +175,16 @@ export default function GeneratePlan() {
                             { icon: Calendar, label: 'Semanas', value: summary.weeks },
                             { icon: Zap, label: 'Sesiones', value: summary.total },
                             { icon: Clock, label: 'Horas', value: `${hours}h` },
-                        ].map(({ icon: Ic, label, value }) => (
-                            <div key={label} className="glass-card p-4 text-center">
-                                <Ic size={16} className="text-dunr-orange mx-auto mb-2" />
-                                <p className="text-2xl font-black text-white leading-none">{value}</p>
-                                <p className="text-[10px] text-white/30 uppercase font-bold tracking-wider mt-1">{label}</p>
-                            </div>
-                        ))}
+                        ].map(({ icon, label, value }) => {
+                            const StatIcon = icon
+                            return (
+                                <div key={label} className="glass-card p-4 text-center">
+                                    <StatIcon size={16} className="text-dunr-orange mx-auto mb-2" />
+                                    <p className="text-2xl font-black text-white leading-none">{value}</p>
+                                    <p className="text-[10px] text-white/30 uppercase font-bold tracking-wider mt-1">{label}</p>
+                                </div>
+                            )
+                        })}
                     </div>
 
                     {/* Type breakdown */}
@@ -241,8 +247,9 @@ export default function GeneratePlan() {
 
             <div className="max-w-sm w-full text-center relative z-10">
                 <div className="relative mb-12">
-                    <div className="w-28 h-28 mx-auto rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-center animate-pulse-glow shadow-2xl shadow-dunr-orange/10">
-                        <Icon size={44} className="text-dunr-orange" />
+                    <div className="w-28 h-28 mx-auto rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm flex flex-col items-center justify-center gap-2 animate-pulse-glow shadow-2xl shadow-dunr-orange/10">
+                        <DunrLogo variant="mark" className="w-16" />
+                        <Icon size={18} className="text-dunr-orange/70" />
                     </div>
                     <div className="absolute -inset-4 mx-auto w-36 h-36">
                         <svg className="animate-spin-slow" viewBox="0 0 128 128">

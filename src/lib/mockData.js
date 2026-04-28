@@ -76,16 +76,6 @@ function generateDemoSessions() {
     for (let week = 0; week < totalWeeks; week++) {
         const isRecoveryWeek = (week + 1) % 4 === 0
         const isTaperingWeek = week >= totalWeeks - 1
-        const weekPhase = isTaperingWeek
-            ? 'tapering'
-            : isRecoveryWeek
-                ? 'descarga'
-                : week < totalWeeks / 3
-                    ? 'base'
-                    : week < (totalWeeks * 2) / 3
-                        ? 'desarrollo'
-                        : 'pico'
-
         for (const dayIdx of trainingDays) {
             const date = new Date(startDate)
             date.setDate(startDate.getDate() + week * 7 + dayIdx)

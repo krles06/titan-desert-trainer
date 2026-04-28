@@ -2,11 +2,12 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import CountdownTimer from '../components/CountdownTimer'
 import CookieBanner from '../components/CookieBanner'
+import DunrLogo from '../components/DunrLogo'
 import {
     Mountain, Brain, Calendar, TrendingUp, ChevronRight,
     Info, Bot, Zap, CheckCircle, BarChart2, RefreshCw
 } from 'lucide-react'
-import { RACES } from '../lib/races'
+import { RACES, getDefaultRace } from '../lib/races'
 
 const STEPS = [
     {
@@ -37,7 +38,7 @@ const FEATURES = [
 
 const STATS = [
     { value: '< 2 min', label: 'para generar tu plan' },
-    { value: '16', label: 'semanas de entrenamiento' },
+    { value: '12+', label: 'semanas de entrenamiento' },
     { value: '5', label: 'tipos de sesión MTB' },
     { value: '24/7', label: 'coach IA disponible' },
 ]
@@ -58,8 +59,13 @@ function AppMockup() {
                 </div>
                 {/* Header */}
                 <div className="px-4 pt-2 pb-3 border-b border-white/5">
-                    <p className="text-[10px] text-white/40">¡Hola, ciclista!</p>
-                    <p className="text-sm font-black text-white">Tu preparación</p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-[10px] text-white/40">¡Hola, ciclista!</p>
+                            <p className="text-sm font-black text-white">Tu preparación</p>
+                        </div>
+                        <DunrLogo variant="mark" className="w-9" />
+                    </div>
                 </div>
                 {/* Next session card */}
                 <div className="mx-3 mt-3 rounded-2xl bg-white/5 border border-dunr-orange/20 border-l-4 border-l-dunr-orange p-3">
@@ -112,6 +118,7 @@ function AppMockup() {
 
 export default function Landing() {
     const { isAuthenticated } = useAuth()
+    const defaultRace = getDefaultRace()
 
     return (
         <div className="min-h-screen flex flex-col bg-dunr-black">
@@ -125,7 +132,7 @@ export default function Landing() {
                 <div className="relative max-w-lg mx-auto">
                     {/* Badge */}
                     <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 mb-6">
-                        <Mountain size={12} className="text-dunr-orange" />
+                        <DunrLogo variant="mark" className="w-9" />
                         <span className="text-[11px] font-bold text-white/70 uppercase tracking-wider">Titan Desert 2026</span>
                     </div>
 
@@ -159,7 +166,7 @@ export default function Landing() {
                     </div>
 
                     {/* Countdown */}
-                    <CountdownTimer targetDate={RACES[0].date} raceName={RACES[0].name} />
+                    <CountdownTimer targetDate={defaultRace.date} raceName={defaultRace.name} />
                 </div>
             </section>
 
@@ -211,17 +218,20 @@ export default function Landing() {
                 <h2 className="text-3xl font-black text-white tracking-tight mb-8">Todo lo que necesitas</h2>
 
                 <div className="grid grid-cols-1 gap-3">
-                    {FEATURES.map(({ icon: Icon, title, desc }) => (
-                        <div key={title} className="glass-card p-4 flex items-start gap-4">
-                            <div className="w-9 h-9 rounded-xl bg-dunr-orange/10 flex items-center justify-center shrink-0">
-                                <Icon size={18} className="text-dunr-orange" />
+                    {FEATURES.map(({ icon, title, desc }) => {
+                        const FeatureIcon = icon
+                        return (
+                            <div key={title} className="glass-card p-4 flex items-start gap-4">
+                                <div className="w-9 h-9 rounded-xl bg-dunr-orange/10 flex items-center justify-center shrink-0">
+                                    <FeatureIcon size={18} className="text-dunr-orange" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-black text-white mb-0.5">{title}</h3>
+                                    <p className="text-xs text-white/50 leading-relaxed">{desc}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-sm font-black text-white mb-0.5">{title}</h3>
-                                <p className="text-xs text-white/50 leading-relaxed">{desc}</p>
-                            </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </section>
 
@@ -245,7 +255,7 @@ export default function Landing() {
                         <div>
                             <p className="text-xs text-white/40 font-black uppercase tracking-wider mb-1">Almería</p>
                             <p className="text-base font-black text-white">Titan Desert Almería</p>
-                            <p className="text-xs text-white/40 mt-1">Oct 2026 · 5 etapas · +350 km</p>
+                            <p className="text-xs text-white/40 mt-1">1-4 oct 2026 · 4 etapas · +350 km</p>
                         </div>
                         <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
                             <Mountain size={20} className="text-white/40" />
@@ -286,7 +296,7 @@ export default function Landing() {
             {/* ── FOOTER ── */}
             <footer className="px-4 py-8 border-t border-white/5 text-center">
                 <div className="max-w-lg mx-auto flex items-center justify-between">
-                    <span className="text-[10px] text-white/20 font-black uppercase tracking-widest">DUNR © 2026</span>
+                    <DunrLogo className="opacity-30" markClassName="h-5" wordClassName="text-[10px] tracking-widest" />
                     <Link to="/legal" className="inline-flex items-center gap-1.5 text-white/20 hover:text-dunr-orange transition-colors text-[10px] font-black uppercase tracking-widest">
                         <Info size={11} />
                         Legal

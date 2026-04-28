@@ -2,8 +2,9 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { DEMO_MODE, DEMO_SESSIONS } from '../lib/mockData'
-import { Send, Bot, ChevronLeft, Trash2 } from 'lucide-react'
+import { Send, ChevronLeft, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import DunrLogo from '../components/DunrLogo'
 
 const QUICK_QUESTIONS = [
     '¿Cómo voy de cara a la carrera?',
@@ -165,7 +166,7 @@ export default function CoachChat() {
                 content: data.reply,
                 id: Date.now().toString()
             }])
-        } catch (err) {
+        } catch {
             setMessages(prev => [...prev, {
                 role: 'assistant',
                 content: 'Ha habido un error. Inténtalo de nuevo en un momento.',
@@ -203,8 +204,8 @@ export default function CoachChat() {
                 <Link to="/dashboard" className="p-2 rounded-xl text-white/40 hover:text-white transition-colors">
                     <ChevronLeft size={20} />
                 </Link>
-                <div className="w-9 h-9 rounded-2xl bg-dunr-orange flex items-center justify-center shrink-0">
-                    <Bot size={18} className="text-black" />
+                <div className="w-11 h-9 rounded-2xl bg-dunr-orange flex items-center justify-center shrink-0">
+                    <DunrLogo variant="mark" color="dark" className="w-8" />
                 </div>
                 <div>
                     <p className="text-sm font-black text-white leading-none">DUNR Coach</p>
@@ -240,8 +241,8 @@ export default function CoachChat() {
                         {messages.map((m, i) => (
                             <div key={m.id || i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
                                 {m.role === 'assistant' && (
-                                    <div className="w-7 h-7 rounded-xl bg-dunr-orange/20 flex items-center justify-center shrink-0 mr-2 mt-1">
-                                        <Bot size={14} className="text-dunr-orange" />
+                                    <div className="w-8 h-7 rounded-xl bg-dunr-orange/20 flex items-center justify-center shrink-0 mr-2 mt-1">
+                                        <DunrLogo variant="mark" className="w-6" />
                                     </div>
                                 )}
                                 <div className="flex flex-col gap-1" style={{ maxWidth: '82%' }}>
@@ -265,8 +266,8 @@ export default function CoachChat() {
 
                         {loading && (
                             <div className="flex justify-start animate-fade-in">
-                                <div className="w-7 h-7 rounded-xl bg-dunr-orange/20 flex items-center justify-center shrink-0 mr-2 mt-1">
-                                    <Bot size={14} className="text-dunr-orange" />
+                                <div className="w-8 h-7 rounded-xl bg-dunr-orange/20 flex items-center justify-center shrink-0 mr-2 mt-1">
+                                    <DunrLogo variant="mark" className="w-6" />
                                 </div>
                                 <div className="bg-white/5 border border-white/5 rounded-2xl rounded-bl-sm">
                                     <TypingDots />

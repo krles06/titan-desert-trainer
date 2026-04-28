@@ -2,6 +2,8 @@
 // Conversational AI coach — does NOT modify the training plan
 // Deploy with: supabase functions deploy coach-chat
 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -13,10 +15,49 @@ Deno.serve(async (req) => {
     }
 
     try {
-        const { message, profile, recentSessions, stats, history } = await req.json()
+        const { message, history } = await req.json()
+        if (!message || typeof message !== 'string' || message.length > 1500) {
+            return new Response(
+                JSON.stringify({ error: 'Mensaje no válido' }),
+                { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+        }
 
         const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
         if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not configured')
+
+        const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+        const authHeader = req.headers.get('Authorization') || req.headers.get('authorization')
+        const token = authHeader?.replace('Bearer ', '') ?? ''
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+        if (authError || !user) throw new Error('Sesión no autorizada')
+
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+        if (profileError || !profile) throw new Error('No se encontró el perfil del atleta')
+
+        const { data: sessions } = await supabase
+            .from('sessions')
+            .select('*')
+            .order('fecha', { ascending: false })
+            .limit(50)
+
+        const userSessions = sessions || []
+        const completedSessions = userSessions.filter((s: any) => s.completada)
+        const stats = {
+            total: userSessions.length,
+            completed: completedSessions.length,
+            percentComplete: userSessions.length ? Math.round((completedSessions.length / userSessions.length) * 100) : 0,
+            hoursTotal: completedSessions.reduce((sum: number, s: any) => sum + (s.tiempo_real_min || s.duracion_min || 0), 0) / 60,
+            streak: 0,
+        }
+        const recentSessions = completedSessions.slice(0, 5)
 
         const RACE_DATES: Record<string, string> = {
             'morocco-2026': '2026-04-26',
@@ -72,7 +113,7 @@ INSTRUCCIONES:
 
         const messages = [
             { role: 'system', content: systemPrompt },
-            ...(history || []).slice(-8),
+            ...(Array.isArray(history) ? history : []).slice(-8),
             { role: 'user', content: message }
         ]
 

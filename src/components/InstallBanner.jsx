@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Download, X } from 'lucide-react'
+import DunrLogo from './DunrLogo'
 
 export default function InstallBanner() {
     const [prompt, setPrompt] = useState(null)
@@ -39,8 +40,8 @@ export default function InstallBanner() {
     return (
         <div className="fixed bottom-20 left-4 right-4 z-40 max-w-lg mx-auto animate-fade-in">
             <div className="glass-card-dark p-4 flex items-center gap-3 border border-dunr-orange/20 shadow-2xl shadow-black/60">
-                <div className="w-10 h-10 rounded-2xl bg-dunr-orange flex items-center justify-center shrink-0">
-                    <Download size={18} className="text-black" />
+                <div className="w-12 h-10 rounded-2xl bg-dunr-orange flex items-center justify-center shrink-0">
+                    <DunrLogo variant="mark" color="dark" className="w-9" />
                 </div>
                 <div className="flex-1 min-w-0">
                     <p className="text-xs font-black text-white uppercase tracking-wider">Instalar DUNR</p>
@@ -48,8 +49,9 @@ export default function InstallBanner() {
                 </div>
                 <button
                     onClick={install}
-                    className="px-3 py-1.5 bg-dunr-orange text-black text-xs font-black rounded-lg shrink-0 hover:bg-dunr-orange-light transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dunr-orange text-black text-xs font-black rounded-lg shrink-0 hover:bg-dunr-orange-light transition-colors"
                 >
+                    <Download size={13} />
                     Instalar
                 </button>
                 <button onClick={dismiss} className="text-white/20 hover:text-white/60 transition-colors shrink-0">

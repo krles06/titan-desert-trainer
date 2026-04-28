@@ -18,7 +18,7 @@ export default function BottomNav() {
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-dunr-black/80 backdrop-blur-xl border-t border-white/5 safe-area-bottom">
             <div className="flex items-center justify-around max-w-lg mx-auto px-4 py-1">
-                {navItems.map(({ to, icon: Icon, label }) => (
+                {navItems.map(({ to, icon, label }) => (
                     <NavLink
                         key={to}
                         to={to}
@@ -29,9 +29,11 @@ export default function BottomNav() {
                             }`
                         }
                     >
-                        {({ isActive }) => (
+                        {({ isActive }) => {
+                            const NavIcon = icon
+                            return (
                             <>
-                                <Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
+                                <NavIcon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
                                 <span className={`text-[11px] font-medium ${isActive ? 'font-semibold' : ''}`}>
                                     {label}
                                 </span>
@@ -39,7 +41,8 @@ export default function BottomNav() {
                                     <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-dunr-orange rounded-full shadow-[0_0_8px_rgba(255,138,0,0.6)]" />
                                 )}
                             </>
-                        )}
+                            )
+                        }}
                     </NavLink>
                 ))}
             </div>

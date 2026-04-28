@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import CountdownTimer from '../components/CountdownTimer'
 import ProgressCharts from '../components/ProgressCharts'
 import WeeklySummary from '../components/WeeklySummary'
+import DunrLogo from '../components/DunrLogo'
 import {
     TrendingUp, Clock, Calendar, Flame, ChevronRight,
     CheckCircle, Zap, Target, RefreshCw, X
@@ -163,8 +164,13 @@ export default function Dashboard() {
             {/* Header */}
             <div className="gradient-desert px-4 pt-6 pb-10">
                 <div className="max-w-lg mx-auto">
-                    <p className="text-white/60 text-sm mb-1">¡Hola, {profile?.nombre?.split(' ')[0] || 'ciclista'}!</p>
-                    <h1 className="text-2xl font-bold text-white mb-4">Tu preparación</h1>
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                            <p className="text-white/60 text-sm mb-1">¡Hola, {profile?.nombre?.split(' ')[0] || 'ciclista'}!</p>
+                            <h1 className="text-2xl font-bold text-white">Tu preparación</h1>
+                        </div>
+                        <DunrLogo variant="mark" className="w-12 mt-1" />
+                    </div>
                     <CountdownTimer
                         mini
                         targetDate={getRaceById(profile?.carrera_id).date}
