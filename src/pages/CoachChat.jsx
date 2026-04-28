@@ -198,21 +198,21 @@ export default function CoachChat() {
     const showQuickQuestions = messages.length <= 1
 
     return (
-        <div className="flex flex-col h-dvh bg-dunr-black">
+        <div className="flex h-[calc(100dvh-72px)] max-h-[calc(100dvh-72px)] min-h-0 flex-col bg-dunr-black pb-1">
             {/* Header */}
-            <div className="flex items-center gap-3 px-4 pt-6 pb-4 border-b border-white/5 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b border-white/5 shrink-0">
                 <Link to="/dashboard" className="p-2 rounded-xl text-white/40 hover:text-white transition-colors">
                     <ChevronLeft size={20} />
                 </Link>
                 <div className="w-11 h-9 rounded-2xl bg-dunr-orange flex items-center justify-center shrink-0">
                     <DunrLogo variant="mark" color="dark" className="w-8" />
                 </div>
-                <div>
+                <div className="min-w-0">
                     <p className="text-sm font-black text-white leading-none">DUNR Coach</p>
                     <p className="text-[10px] text-white/40 mt-0.5">Entrenador personal IA</p>
                 </div>
-                <div className="ml-auto flex items-center gap-3">
-                    <div className="flex items-center gap-1.5">
+                <div className="ml-auto flex items-center gap-2 sm:gap-3">
+                    <div className="hidden sm:flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-titan-success animate-pulse" />
                         <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">Activo</span>
                     </div>
@@ -228,7 +228,7 @@ export default function CoachChat() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+            <div className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-4 py-4 space-y-4">
                 {loadingHistory ? (
                     <div className="space-y-4 animate-pulse">
                         <div className="flex gap-2">
@@ -245,7 +245,7 @@ export default function CoachChat() {
                                         <DunrLogo variant="mark" className="w-6" />
                                     </div>
                                 )}
-                                <div className="flex flex-col gap-1" style={{ maxWidth: '82%' }}>
+                                <div className="flex flex-col gap-1 max-w-[86%] sm:max-w-[82%]">
                                     <div
                                         className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                                             m.role === 'user'
@@ -281,7 +281,7 @@ export default function CoachChat() {
 
             {/* Quick questions */}
             {showQuickQuestions && !loadingHistory && (
-                <div className="px-4 pb-3 flex gap-2 overflow-x-auto shrink-0 no-scrollbar">
+                <div className="px-3 sm:px-4 pb-2 sm:pb-3 flex gap-2 overflow-x-auto shrink-0 no-scrollbar">
                     {QUICK_QUESTIONS.map(q => (
                         <button
                             key={q}
@@ -295,7 +295,7 @@ export default function CoachChat() {
             )}
 
             {/* Input */}
-            <div className="px-4 pb-6 pt-2 border-t border-white/5 shrink-0">
+            <div className="px-3 sm:px-4 pb-3 pt-2 border-t border-white/5 shrink-0">
                 <div className="flex gap-2 items-end">
                     <textarea
                         ref={inputRef}

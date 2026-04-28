@@ -12,7 +12,7 @@ export default function BottomNav() {
     const location = useLocation()
 
     // Hide on landing, auth, and onboarding pages
-    const hiddenPaths = ['/', '/login', '/register', '/forgot-password', '/onboarding', '/generate-plan', '/coach']
+    const hiddenPaths = ['/', '/login', '/register', '/forgot-password', '/onboarding', '/generate-plan']
     if (hiddenPaths.includes(location.pathname)) return null
 
     return (

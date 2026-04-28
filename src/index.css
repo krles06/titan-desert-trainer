@@ -145,6 +145,18 @@
     border-radius: 8px;
   }
 
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   .gradient-desert {
     background: linear-gradient(160deg, #000000 0%, #0A0A0A 50%, #111108 85%, #1a1900 100%);
   }
